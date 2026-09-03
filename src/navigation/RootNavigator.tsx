@@ -5,7 +5,7 @@ import AuthNavigator from './AuthNavigator';
 import MainNavigator from './MainNavigator';
 
 export default function RootNavigator() {
-  const isAuthenticated = true; // Replace with your authentication logic
+  const isAuthenticated = false; // Replace with your authentication logic
 
   return (
     <NavigationContainer>

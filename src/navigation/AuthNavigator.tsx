@@ -6,7 +6,9 @@ import OTPScreen from '../screens/auth/OTPScreen';
 
 export type AuthStackParamList = {
   Login: undefined;
-  OTP: undefined;
+  OTP: {
+    phone: string;
+  };
 };
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();
