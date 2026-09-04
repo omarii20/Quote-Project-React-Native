@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {
+  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
@@ -13,21 +14,37 @@ import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import type {AuthStackParamList} from '../../navigation/AuthNavigator';
 import AppLogo from '../../components/ui/AppLogo';
 import {Colors} from '../../constants/colors';
+import {useAuth} from '../../context/AuthContext';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'Login'>;
 
 export default function LoginScreen({navigation}: Props) {  const [phone, setPhone] = useState('');
-
+  const {sendOTP} = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
   const isValidPhone = /^05\d{8}$/.test(phone);
 
-  const handleSendOTP = () => {
-    if (!isValidPhone) {
+  const handleSendOTP = async () => {
+    if (!isValidPhone || isLoading) {
       return;
     }
 
-    navigation.navigate('OTP', {
-      phone,
-    });
+    try {
+      setIsLoading(true);
+      setError('');
+
+      await sendOTP(phone);
+
+      navigation.navigate('OTP', {
+        phone,
+      });
+    } catch (err) {
+      console.log('Login send OTP error:', err);
+
+      setError('לא הצלחנו להתחיל את תהליך האימות. נסו שוב.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -63,13 +80,27 @@ export default function LoginScreen({navigation}: Props) {  const [phone, setPho
             <TouchableOpacity
               style={[
                 styles.button,
-                !isValidPhone && styles.buttonDisabled,
+                (!isValidPhone || isLoading) && styles.buttonDisabled,
               ]}
-              disabled={!isValidPhone}
+              disabled={!isValidPhone || isLoading}
               activeOpacity={0.85}
               onPress={handleSendOTP}>
-              <Text style={styles.buttonText}>שלח קוד אימות</Text>
+              {isLoading ? (
+                <ActivityIndicator
+                  size="small"
+                  color={Colors.surface}
+                />
+              ) : (
+                <Text style={styles.buttonText}>
+                  שלח קוד אימות
+                </Text>
+              )}
             </TouchableOpacity>
+            {!!error && (
+              <Text style={styles.errorText}>
+                {error}
+              </Text>
+            )}
           </View>
 
           <Text style={styles.helperText}>
@@ -178,5 +209,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.textSecondary,
     textAlign: 'center',
+  },
+  errorText: {
+    marginTop: 10,
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.danger,
+    textAlign: 'right',
   },
 });
