@@ -10,17 +10,17 @@ import {
 } from 'react-native';
 
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
-
 import type {AuthStackParamList} from '../../navigation/AuthNavigator';
 import {Colors} from '../../constants/colors';
+import {useAuth} from '../../context/AuthContext';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'OTP'>;
 
-const OTP_LENGTH = 4;
+const OTP_LENGTH = 6;
 
 export default function OTPScreen({navigation, route}: Props) {
+  const {verifyOTP} = useAuth();
   const {phone} = route.params;
-
   const [otp, setOtp] = useState('');
   const [seconds, setSeconds] = useState(25);
   const [isVerifying, setIsVerifying] = useState(false);
@@ -45,17 +45,9 @@ export default function OTPScreen({navigation, route}: Props) {
       setIsVerifying(true);
       setError('');
 
-      console.log('Verify OTP:', code);
+      await verifyOTP(code);
 
-      // Firebase verification ייכנס לכאן בהמשך
-      await new Promise<void>(resolve => {
-        setTimeout(() => resolve(), 1000);
-      });
       console.log('OTP verified successfully');
-
-      // בהמשך, אחרי Firebase:
-      // authentication state ישתנה
-      // וה-RootNavigator יעביר אותנו ל-MainNavigator
     } catch (err) {
       console.log('OTP verification error:', err);
 
