@@ -1,13 +1,13 @@
 import React from 'react';
 import {Image, StyleSheet, Text, View} from 'react-native';
 
-import {Colors} from '../../constants/colors';
+import {Colors} from '../constants/colors';
 
 export default function AppLogo() {
   return (
     <View style={styles.container}>
       <Image
-        source={require('../../assets/images/logos/quote-logo.png')}
+        source={require('../assets/images/logos/quote-logo.png')}
         style={styles.logo}
         resizeMode="contain"
       />

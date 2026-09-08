@@ -22,6 +22,7 @@ type AuthContextType = {
   sendOTP: (phone: string) => Promise<void>;
   verifyOTP: (code: string) => Promise<void>;
   logout: () => Promise<void>;
+  getToken: () => Promise<string | null>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -32,9 +33,7 @@ type AuthProviderProps = {
 
 export function AuthProvider({children}: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);  const [loading, setLoading] = useState(true);
-  const [confirmation, setConfirmation] =
-    useState<ConfirmationResult | null>(null);
-
+  const [confirmation, setConfirmation] =useState<ConfirmationResult | null>(null);
   const auth = getAuth();
 
   useEffect(() => {
@@ -91,10 +90,7 @@ export function AuthProvider({children}: AuthProviderProps) {
 
       const result = await confirmation.confirm(code);
 
-      console.log(
-        'Firebase user authenticated:',
-        result.user.uid,
-      );
+      console.log('Firebase user authenticated:', result.user.uid);
 
       setConfirmation(null);
     } catch (error) {
@@ -116,6 +112,16 @@ export function AuthProvider({children}: AuthProviderProps) {
     }
   };
 
+  const getToken = async (): Promise<string | null> => {
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) {
+      return null;
+    }
+
+    return currentUser.getIdToken();
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -124,6 +130,7 @@ export function AuthProvider({children}: AuthProviderProps) {
         sendOTP,
         verifyOTP,
         logout,
+        getToken,
       }}>
       {children}
     </AuthContext.Provider>
