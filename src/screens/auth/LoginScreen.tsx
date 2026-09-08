@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import type {AuthStackParamList} from '../../navigation/AuthNavigator';
-import AppLogo from '../../components/ui/AppLogo';
+import AppLogo from '../../components/AppLogo';
 import {Colors} from '../../constants/colors';
 import {useAuth} from '../../context/AuthContext';
 
