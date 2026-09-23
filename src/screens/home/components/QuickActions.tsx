@@ -6,9 +6,17 @@ import {
   View,
 } from 'react-native';
 
+import {useNavigation} from '@react-navigation/native';
+import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import type {MainStackParamList} from '../../../navigation/MainNavigator';
+
 import {Colors} from '../../../constants/colors';
 
+type NavigationProp = NativeStackNavigationProp<MainStackParamList>;
+
 export default function QuickActions() {
+  const navigation = useNavigation<NavigationProp>();
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
@@ -18,8 +26,10 @@ export default function QuickActions() {
       <View style={styles.actionsRow}>
         <TouchableOpacity
           style={styles.primaryButton}
-          activeOpacity={0.8}>
-
+          activeOpacity={0.8}
+          onPress={() =>
+            navigation.navigate('CreateQuote')
+          }>
           <Text style={styles.primaryButtonText}>
             + הצעה חדשה
           </Text>

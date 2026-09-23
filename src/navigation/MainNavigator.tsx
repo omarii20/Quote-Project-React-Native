@@ -1,33 +1,39 @@
 import React from 'react';
 import {
-  createBottomTabNavigator,
-} from '@react-navigation/bottom-tabs';
+  createNativeStackNavigator,
+} from '@react-navigation/native-stack';
 
-import HomeScreen from '../screens/home/HomeScreen';
-import CustomersScreen from '../screens/customers/CustomersScreen';
-import QuotesScreen from '../screens/quotes/QuotesScreen';
-import SettingsScreen from '../screens/settings/SettingsScreen';
+import MainTabNavigator from './MainTabNavigator';
+import CreateQuoteScreen from '../screens/quotes/CreateQuoteScreen';
+import QuoteDetailsScreen from '../screens/quotes/QuoteDetailsScreen';
+import {
+  QuotesProvider,
+} from '../context/QuotesContext';
+import EditQuoteScreen from '../screens/quotes/EditQuoteScreen';
 
-import { QuotesProvider} from '../context/QuotesContext';
-
-export type MainTabParamList = {
-  Home: undefined;
-  Customers: undefined;
-  Quotes: undefined;
-  Settings: undefined;
+export type MainStackParamList = {
+  MainTabs: undefined;
+  CreateQuote: undefined;
+  QuoteDetails: {
+    quoteId: number;
+  };
+  EditQuote: {
+    quoteId: number;
+  };
 };
 
-const Tab = createBottomTabNavigator<MainTabParamList>();
+const Stack = createNativeStackNavigator<MainStackParamList>();
 
 export default function MainNavigator() {
   return (
     <QuotesProvider>
-      <Tab.Navigator screenOptions={{headerShown: false, }}>
-        <Tab.Screen name="Home"component={HomeScreen}/>
-        <Tab.Screen name="Customers" component={CustomersScreen}/>
-        <Tab.Screen name="Quotes" component={QuotesScreen} />
-        <Tab.Screen name="Settings"component={SettingsScreen}/>
-      </Tab.Navigator>
+      <Stack.Navigator
+        screenOptions={{headerShown: false, }}>
+        <Stack.Screen name="MainTabs" component={MainTabNavigator}/>
+        <Stack.Screen name="CreateQuote" component={CreateQuoteScreen} />
+        <Stack.Screen name="QuoteDetails" component={QuoteDetailsScreen}/>
+        <Stack.Screen name="EditQuote" component={EditQuoteScreen}/>
+      </Stack.Navigator>
     </QuotesProvider>
   );
 }

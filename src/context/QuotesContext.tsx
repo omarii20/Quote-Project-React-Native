@@ -23,18 +23,13 @@ type QuotesContextType = {
   removeQuote: (quoteId: number) => void;
 };
 
-const QuotesContext =
-  createContext<QuotesContextType | undefined>(
-    undefined,
-  );
+const QuotesContext = createContext<QuotesContextType | undefined>(undefined,);
 
 type Props = {
   children: React.ReactNode;
 };
 
-export function QuotesProvider({
-  children,
-}: Props) {
+export function QuotesProvider({children}: Props) {
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -106,8 +101,7 @@ export function QuotesProvider({
 }
 
 export function useQuotes() {
-  const context =
-    useContext(QuotesContext);
+  const context = useContext(QuotesContext);
 
   if (!context) {
     throw new Error(

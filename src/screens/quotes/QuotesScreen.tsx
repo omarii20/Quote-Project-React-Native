@@ -1,18 +1,25 @@
 import React from 'react';
 import {
   ActivityIndicator,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
+import {SafeAreaView,} from 'react-native-safe-area-context';
+import {TouchableOpacity,} from 'react-native';
+import {useNavigation,} from '@react-navigation/native';
+import type {NativeStackNavigationProp,} from '@react-navigation/native-stack';
 
 import {Colors} from '../../constants/colors';
 import {useQuotes} from '../../context/QuotesContext';
 import QuoteStatusBadge from '../../components/ui/QuoteStatusBadge';
+import type {MainStackParamList,} from '../../navigation/MainNavigator';
+
+type QuotesNavigationProp =NativeStackNavigationProp< MainStackParamList>;
 
 export default function QuotesScreen() {
+  const navigation = useNavigation<QuotesNavigationProp>();
   const {
     quotes,
     loading,
@@ -56,9 +63,15 @@ export default function QuotesScreen() {
             הצעות מחיר
           </Text>
 
-          <Text style={styles.subtitle}>
-            {quotes.length} הצעות
-          </Text>
+          <View style={styles.quoteCount}>
+            <Text style={styles.quoteCountValue}>
+              {quotes.length}
+            </Text>
+
+            <Text style={styles.quoteCountLabel}>
+              הצעות
+            </Text>
+          </View>
         </View>
 
         {loading ? (
@@ -90,9 +103,18 @@ export default function QuotesScreen() {
           </View>
         ) : (
           quotes.map(quote => (
-            <View
+            <TouchableOpacity
               key={quote.id}
-              style={styles.quoteCard}>
+              style={styles.quoteCard}
+              activeOpacity={0.8}
+              onPress={() =>
+                navigation.navigate(
+                  'QuoteDetails',
+                  {
+                    quoteId: quote.id,
+                  },
+                )
+            }>
 
               <View style={styles.quoteTopRow}>
                 <Text style={styles.quoteNumber}>
@@ -141,7 +163,7 @@ export default function QuotesScreen() {
                   </Text>
                 </View>
               </View>
-            </View>
+            </TouchableOpacity>
           ))
         )}
       </ScrollView>
@@ -173,11 +195,22 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
 
-  subtitle: {
+  quoteCount: {
     marginTop: 6,
-    fontSize: 14,
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: 5,
+  },
+
+  quoteCountValue: {
+    color: Colors.primary,
+    fontSize: 17,
+    fontWeight: '700',
+  },
+
+  quoteCountLabel: {
     color: Colors.textSecondary,
-    textAlign: 'right',
+    fontSize: 14,
   },
 
   loadingContainer: {
