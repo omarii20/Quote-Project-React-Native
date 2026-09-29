@@ -171,3 +171,9 @@ export const updateQuote = async (quoteId: number,data: UpdateQuoteData): Promis
     },
   );
 };
+
+export const deleteQuote = async (quoteId: number): Promise<void> => {
+  await apiRequest<void>(`/quotes/${quoteId}`, {
+    method: 'DELETE',
+  });
+};
