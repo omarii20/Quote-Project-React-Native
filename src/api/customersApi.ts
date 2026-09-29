@@ -43,6 +43,11 @@ type CreateCustomerResponse = {
   customer: Customer;
 };
 
+type DeleteCustomerResponse = {
+  success: boolean;
+  message: string;
+};
+
 export const getCustomers = async (): Promise<Customer[]> => {
   const response = await apiRequest<CustomersResponse>('/customers',
     {
@@ -83,4 +88,12 @@ export const updateCustomer = async (customerId: number,data: UpdateCustomerData
   );
 
   return response.customer;
+};
+
+export const deleteCustomer = async (customerId: number): Promise<void> => {
+  await apiRequest<DeleteCustomerResponse>(`/customers/${customerId}`,
+    {
+      method: 'DELETE',
+    },
+  );
 };

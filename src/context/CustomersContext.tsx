@@ -24,11 +24,7 @@ const CustomersContext = createContext<CustomersContextType | undefined>(
   undefined,
 );
 
-export function CustomersProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export function CustomersProvider({children}: {children: React.ReactNode;}) {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');

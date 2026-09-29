@@ -4,10 +4,18 @@ const API_BASE_URL = 'http://10.0.2.2:8080';
 
 type ApiRequestOptions = RequestInit;
 
-export async function apiRequest<T>(
-  endpoint: string,
-  options: ApiRequestOptions = {},
-): Promise<T> {
+export class ApiError extends Error {
+  status: number;
+
+  constructor(message: string, status: number) {
+    super(message);
+
+    this.name = 'ApiError';
+    this.status = status;
+  }
+}
+
+export async function apiRequest<T>(endpoint: string,options: ApiRequestOptions = {},): Promise<T> {
   const auth = getAuth();
   const user = auth.currentUser;
 
@@ -27,8 +35,9 @@ export async function apiRequest<T>(
   });
 
   if (!response.ok) {
-    throw new Error(
+    throw new ApiError(
       `API request failed: ${response.status} ${response.statusText}`,
+      response.status,
     );
   }
 

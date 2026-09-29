@@ -1,29 +1,27 @@
-import React from 'react';
-
+import React, {useState} from 'react';
 import {
+ActivityIndicator,
+  Alert,  
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-
 import {SafeAreaView} from 'react-native-safe-area-context';
-
 import {
   useNavigation,
   useRoute,
   type RouteProp,
 } from '@react-navigation/native';
-
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-
 import type {MainStackParamList} from '../../navigation/MainNavigator';
-
 import {useCustomers} from '../../context/CustomersContext';
+import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons';
+import {deleteCustomer} from '../../api/customersApi';
+import {ApiError} from '../../api/apiClient';
 
 import {Colors} from '../../constants/colors';
-
 import BackButton from '../../components/ui/BackButton';
 
 type CustomerDetailsRouteProp =
@@ -35,18 +33,69 @@ type CustomerDetailsNavigationProp =
 export default function CustomerDetailsScreen() {
   const route = useRoute<CustomerDetailsRouteProp>();
   const navigation = useNavigation<CustomerDetailsNavigationProp>();
-
+  const [deleting, setDeleting] = useState(false);
   const {customerId} = route.params;
 
   const {
     customers,
     loading,
     error,
+    removeCustomer,
   } = useCustomers();
 
   const customer = customers.find(
     item => item.id === customerId,
   );
+
+  const handleDeleteCustomer = () => {
+    if (!customer || deleting) {
+        return;
+    }
+
+    Alert.alert(
+        'מחיקת לקוח',
+        `האם אתה בטוח שברצונך למחוק את ${customer.name}?`,
+        [
+        {
+            text: 'ביטול',
+            style: 'cancel',
+        },
+        {
+            text: 'מחיקה',
+            style: 'destructive',
+            onPress: async () => {
+            try {
+                setDeleting(true);
+
+                await deleteCustomer(customer.id);
+
+                removeCustomer(customer.id);
+
+                navigation.goBack();
+            } catch (err) {
+                console.log('Delete customer error:', err);
+
+                if (err instanceof ApiError && err.status === 409) {
+                    Alert.alert(
+                    'לא ניתן למחוק את הלקוח',
+                    'קיימות הצעות מחיר המשויכות ללקוח הזה.',
+                    );
+
+                    return;
+                }
+
+                Alert.alert(
+                    'שגיאה',
+                    'לא הצלחנו למחוק את הלקוח.',
+                );
+                } finally {
+                setDeleting(false);
+            }
+            },
+        },
+        ],
+    );
+    };
 
   if (loading) {
     return (
@@ -81,13 +130,30 @@ export default function CustomerDetailsScreen() {
         showsVerticalScrollIndicator={false}>
 
         <View style={styles.header}>
-          <BackButton />
+        <BackButton />
 
-          <Text style={styles.headerTitle}>
+        <Text style={styles.headerTitle}>
             פרטי לקוח
-          </Text>
+        </Text>
 
-          <View style={styles.headerPlaceholder} />
+        <TouchableOpacity
+            style={styles.deleteIconButton}
+            activeOpacity={0.7}
+            disabled={deleting}
+            onPress={handleDeleteCustomer}>
+            {deleting ? (
+            <ActivityIndicator
+                size="small"
+                color={Colors.danger}
+            />
+            ) : (
+            <MaterialDesignIcons
+                name="delete-outline"
+                size={24}
+                color={Colors.danger}
+            />
+            )}
+        </TouchableOpacity>
         </View>
 
         <View style={styles.customerHeader}>
@@ -198,10 +264,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     color: Colors.textPrimary,
-  },
-
-  headerPlaceholder: {
-    width: 40,
   },
 
   customerHeader: {
@@ -319,5 +381,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.danger,
     textAlign: 'center',
+  },
+  deleteIconButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FEE2E2',
   },
 });
