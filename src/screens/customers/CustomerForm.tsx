@@ -13,6 +13,7 @@ import {Colors} from '../../constants/colors';
 
 import type {
   CreateCustomerData,
+  Customer,
 } from '../../api/customersApi';
 
 type Props = {
@@ -21,16 +22,21 @@ type Props = {
   ) => Promise<void>;
 
   loading?: boolean;
+  initialValues?: Customer;
+  submitLabel?: string;
 };
 
 export default function CustomerForm({
   onSubmit,
   loading = false,
+  initialValues,
+  submitLabel = 'שמור לקוח',
 }: Props) {
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
-  const [address, setAddress] = useState('');
+  const [name, setName] = useState(initialValues?.name ?? '');
+  const [phone, setPhone] = useState(initialValues?.phone ?? '');
+  const [email, setEmail] = useState(initialValues?.email ?? '');
+  const [address, setAddress] = useState(initialValues?.address ?? '');
+  const [notes, setNotes] = useState(initialValues?.notes ?? '');
 
   const handleSubmit = async () => {
     const trimmedName = name.trim();
@@ -44,6 +50,7 @@ export default function CustomerForm({
       phone: phone.trim(),
       email: email.trim(),
       address: address.trim(),
+      notes: notes.trim(),
     });
   };
 
@@ -112,6 +119,27 @@ export default function CustomerForm({
         textAlign="right"
       />
 
+      <Text style={styles.label}>
+        הערות
+      </Text>
+
+      <TextInput
+        style={[
+          styles.input,
+          styles.notesInput,
+        ]}
+        value={notes}
+        onChangeText={setNotes}
+        placeholder="הערות על הלקוח"
+        placeholderTextColor={
+          Colors.textSecondary
+        }
+        multiline
+        numberOfLines={4}
+        textAlign="right"
+        textAlignVertical="top"
+      />
+
       <TouchableOpacity
         style={[
           styles.submitButton,
@@ -127,7 +155,7 @@ export default function CustomerForm({
           />
         ) : (
           <Text style={styles.submitText}>
-            שמור לקוח
+            {submitLabel}
           </Text>
         )}
       </TouchableOpacity>
@@ -158,6 +186,12 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
     color: Colors.textPrimary,
     fontSize: 15,
+  },
+
+  notesInput: {
+    minHeight: 100,
+    paddingTop: 14,
+    paddingBottom: 14,
   },
 
   submitButton: {

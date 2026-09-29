@@ -37,8 +37,10 @@ export default function QuickActions() {
 
         <TouchableOpacity
           style={styles.secondaryButton}
-          activeOpacity={0.8}>
-
+          activeOpacity={0.8}
+          onPress={() =>
+            navigation.navigate('CreateCustomer')
+          }>
           <Text style={styles.secondaryButtonText}>
             + לקוח חדש
           </Text>

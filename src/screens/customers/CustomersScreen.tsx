@@ -1,4 +1,5 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useMemo, useState} from 'react';
+
 import {
   ActivityIndicator,
   ScrollView,
@@ -8,42 +9,30 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SafeAreaView} from 'react-native-safe-area-context';
+
+import {SafeAreaView} from 'react-native-safe-area-context';
+
+import {useNavigation} from '@react-navigation/native';
+import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 import {Colors} from '../../constants/colors';
-import {
-  getCustomers,
-  type Customer,
-} from '../../api/customersApi';
+
+import {useCustomers} from '../../context/CustomersContext';
+
+import type {MainStackParamList} from '../../navigation/MainNavigator';
+
+type CustomersNavigationProp = NativeStackNavigationProp<MainStackParamList>;
 
 export default function CustomersScreen() {
-  const [customers, setCustomers] = useState<Customer[]>([]);
+  const navigation = useNavigation<CustomersNavigationProp>();
+
+  const {
+    customers,
+    loading,
+    error,
+  } = useCustomers();
+
   const [search, setSearch] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
-  useEffect(() => {
-    const loadCustomers = async () => {
-      try {
-        setLoading(true);
-        setError('');
-
-        const data = await getCustomers();
-
-        console.log('Customers response:', data);
-
-        setCustomers(data);
-      } catch (err) {
-        console.log('Load customers error:', err);
-
-        setError('לא הצלחנו לטעון את הלקוחות.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadCustomers();
-  }, []);
 
   const filteredCustomers = useMemo(() => {
     const value = search.trim().toLowerCase();
@@ -101,7 +90,10 @@ export default function CustomersScreen() {
         <View style={styles.actionsRow}>
           <TouchableOpacity
             style={styles.addButton}
-            activeOpacity={0.8}>
+            activeOpacity={0.8}
+            onPress={() =>
+              navigation.navigate('CreateCustomer')
+            }>
             <Text style={styles.addButtonText}>
               + לקוח חדש
             </Text>
@@ -164,7 +156,12 @@ export default function CustomersScreen() {
               <TouchableOpacity
                 key={customer.id}
                 style={styles.customerCard}
-                activeOpacity={0.8}>
+                activeOpacity={0.8}
+                onPress={() =>
+                  navigation.navigate('CustomerDetails', {
+                    customerId: customer.id,
+                  })
+                }>
 
                 <View style={styles.customerHeader}>
                   <View style={styles.avatar}>
