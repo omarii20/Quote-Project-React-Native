@@ -20,9 +20,22 @@ export type CreateCustomerData = {
   notes?: string;
 };
 
+export type UpdateCustomerData = {
+  name?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  notes?: string;
+};
+
 type CustomersResponse = {
   success: boolean;
   customers: Customer[];
+};
+
+type CustomerResponse = {
+  success: boolean;
+  customer: Customer;
 };
 
 type CreateCustomerResponse = {
@@ -32,21 +45,42 @@ type CreateCustomerResponse = {
 
 export const getCustomers = async (): Promise<Customer[]> => {
   const response = await apiRequest<CustomersResponse>('/customers',
-      {
-        method: 'GET',
-      },
-    );
+    {
+      method: 'GET',
+    },
+  );
 
   return response.customers;
 };
 
-export const createCustomer = async (data: CreateCustomerData): Promise<Customer> => {
-  const response =await apiRequest<CreateCustomerResponse>( '/customers',
+export const getCustomerById = async (customerId: number): Promise<Customer> => {
+  const response = await apiRequest<CustomerResponse>(`/customers/${customerId}`,
     {
-        method: 'POST',
-        body: JSON.stringify(data),
-      },
-    );
+      method: 'GET',
+    },
+  );
+
+  return response.customer;
+};
+
+export const createCustomer = async (data: CreateCustomerData): Promise<Customer> => {
+  const response = await apiRequest<CreateCustomerResponse>('/customers',
+    {
+      method: 'POST',
+      body: JSON.stringify(data),
+    },
+  );
+
+  return response.customer;
+};
+
+export const updateCustomer = async (customerId: number,data: UpdateCustomerData,): Promise<Customer> => {
+  const response = await apiRequest<CustomerResponse>(`/customers/${customerId}`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    },
+  );
 
   return response.customer;
 };
