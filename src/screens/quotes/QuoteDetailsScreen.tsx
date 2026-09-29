@@ -6,6 +6,7 @@ import React, {
 import {
   ActivityIndicator,
   ScrollView,
+  Alert,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -32,11 +33,15 @@ import type {
   MainStackParamList,
 } from '../../navigation/MainNavigator';
 
+import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons';
+
 import {
+  deleteQuote,
   getQuoteById,
   type Quote,
 } from '../../api/quotesApi';
 
+import {useQuotes} from '../../context/QuotesContext';
 import {Colors} from '../../constants/colors';
 
 import QuoteStatusBadge from '../../components/ui/QuoteStatusBadge';
@@ -59,10 +64,12 @@ export default function QuoteDetailsScreen() {
   const navigation = useNavigation<QuoteDetailsNavigationProp>();
 
   const {quoteId} = route.params;
-
+  
   const [quote, setQuote] = useState<Quote | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const {removeQuote} = useQuotes();
+  const [deleting, setDeleting] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -124,6 +131,47 @@ export default function QuoteDetailsScreen() {
     );
   };
 
+  const handleDeleteQuote = () => {
+    if (!quote || deleting) {
+      return;
+    }
+
+    Alert.alert(
+      'מחיקת הצעת מחיר',
+      `האם אתה בטוח שברצונך למחוק את ${quote.quote_number}?`,
+      [
+        {
+          text: 'ביטול',
+          style: 'cancel',
+        },
+        {
+          text: 'מחיקה',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setDeleting(true);
+
+              await deleteQuote(quote.id);
+
+              removeQuote(quote.id);
+
+              navigation.goBack();
+            } catch (err) {
+              console.log('Delete quote error:', err);
+
+              Alert.alert(
+                'שגיאה',
+                'לא הצלחנו למחוק את הצעת המחיר.',
+              );
+            } finally {
+              setDeleting(false);
+            }
+          },
+        },
+      ],
+    );
+  };
+
   const canEdit = quote?.status !== 'approved';
 
   if (loading) {
@@ -173,6 +221,25 @@ export default function QuoteDetailsScreen() {
             />
           </View>
         </View>
+
+        <TouchableOpacity
+          style={styles.deleteIconButton}
+          activeOpacity={0.7}
+          disabled={deleting}
+          onPress={handleDeleteQuote}>
+          {deleting ? (
+            <ActivityIndicator
+              size="small"
+              color={Colors.danger}
+            />
+          ) : (
+            <MaterialDesignIcons
+              name="delete-outline"
+              size={24}
+              color={Colors.danger}
+            />
+          )}
+        </TouchableOpacity>
       </View>
 
       <ScrollView
@@ -597,5 +664,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     color: '#FFFFFF',
+  },
+
+  deleteIconButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FEE2E2',
   },
 });
