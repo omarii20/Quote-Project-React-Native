@@ -13,7 +13,7 @@ import {
   View,
 } from 'react-native';
 
-import {Colors} from '../../constants/colors';
+import {useTheme} from '../../context/ThemeContext';
 
 import type {
   Customer,
@@ -44,6 +44,8 @@ export default function CustomerSelector({
   onAddCustomer,
   creatingCustomer = false,
 }: Props) {
+  const {colors} = useTheme();
+
   const [visible, setVisible] =
     useState(false);
 
@@ -123,26 +125,43 @@ export default function CustomerSelector({
   return (
     <>
       <View style={styles.container}>
-        <Text style={styles.label}>
+        <Text
+          style={[
+            styles.label,
+            {color: colors.textPrimary},
+          ]}>
           לקוח *
         </Text>
 
         <TouchableOpacity
-          style={styles.selector}
+          style={[
+            styles.selector,
+            {
+              borderColor: colors.border,
+              backgroundColor: colors.surface,
+            },
+          ]}
           activeOpacity={0.7}
           onPress={() => setVisible(true)}>
           <Text
             style={[
               styles.selectorText,
-              !selectedCustomer &&
-                styles.placeholder,
+              {
+                color: selectedCustomer
+                  ? colors.textPrimary
+                  : colors.textSecondary,
+              },
             ]}>
             {selectedCustomer
               ? selectedCustomer.name
               : 'בחר לקוח'}
           </Text>
 
-          <Text style={styles.arrow}>
+          <Text
+            style={[
+              styles.arrow,
+              {color: colors.textSecondary},
+            ]}>
             ▼
           </Text>
         </TouchableOpacity>
@@ -154,9 +173,17 @@ export default function CustomerSelector({
         animationType="slide"
         onRequestClose={handleClose}>
         <View style={styles.overlay}>
-          <View style={styles.modal}>
+          <View
+            style={[
+              styles.modal,
+              {backgroundColor: colors.surface},
+            ]}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>
+              <Text
+                style={[
+                  styles.modalTitle,
+                  {color: colors.textPrimary},
+                ]}>
                 {showCustomerForm
                   ? 'לקוח חדש'
                   : 'בחירת לקוח'}
@@ -165,7 +192,11 @@ export default function CustomerSelector({
               <TouchableOpacity
                 onPress={handleClose}
                 activeOpacity={0.7}>
-                <Text style={styles.closeText}>
+                <Text
+                  style={[
+                    styles.closeText,
+                    {color: colors.textSecondary},
+                  ]}>
                   ✕
                 </Text>
               </TouchableOpacity>
@@ -181,15 +212,20 @@ export default function CustomerSelector({
                     setCreateError('');
                   }}>
                   <Text
-                    style={
-                      styles.backToCustomersText
-                    }>
+                    style={[
+                      styles.backToCustomersText,
+                      {color: colors.primary},
+                    ]}>
                     חזרה לרשימת הלקוחות
                   </Text>
                 </TouchableOpacity>
 
                 {createError ? (
-                  <Text style={styles.errorText}>
+                  <Text
+                    style={[
+                      styles.errorText,
+                      {color: colors.danger},
+                    ]}>
                     {createError}
                   </Text>
                 ) : null}
@@ -206,26 +242,37 @@ export default function CustomerSelector({
             ) : (
               <>
                 <TextInput
-                  style={styles.searchInput}
+                  style={[
+                    styles.searchInput,
+                    {
+                      borderColor: colors.border,
+                      color: colors.textPrimary,
+                      backgroundColor: colors.background,
+                    },
+                  ]}
                   value={search}
                   onChangeText={setSearch}
                   placeholder="חיפוש לפי שם או טלפון"
                   placeholderTextColor={
-                    Colors.textSecondary
+                    colors.textSecondary
                   }
                   textAlign="right"
                 />
 
                 <TouchableOpacity
-                  style={styles.addCustomerButton}
+                  style={[
+                    styles.addCustomerButton,
+                    {borderColor: colors.primary},
+                  ]}
                   activeOpacity={0.7}
                   onPress={() =>
                     setShowCustomerForm(true)
                   }>
                   <Text
-                    style={
-                      styles.addCustomerText
-                    }>
+                    style={[
+                      styles.addCustomerText,
+                      {color: colors.primary},
+                    ]}>
                     + הוסף לקוח חדש
                   </Text>
                 </TouchableOpacity>
@@ -238,31 +285,43 @@ export default function CustomerSelector({
                   keyboardShouldPersistTaps="handled"
                   ListEmptyComponent={
                     <Text
-                      style={styles.emptyText}>
+                      style={[
+                        styles.emptyText,
+                        {color: colors.textSecondary},
+                      ]}>
                       לא נמצאו לקוחות
                     </Text>
                   }
                   renderItem={({item}) => (
                     <TouchableOpacity
-                      style={
-                        styles.customerItem
-                      }
+                      style={[
+                        styles.customerItem,
+                        {
+                          borderBottomColor:
+                            colors.border,
+                        },
+                      ]}
                       activeOpacity={0.7}
                       onPress={() =>
                         handleSelect(item)
                       }>
                       <Text
-                        style={
-                          styles.customerName
-                        }>
+                        style={[
+                          styles.customerName,
+                          {color: colors.textPrimary},
+                        ]}>
                         {item.name}
                       </Text>
 
                       {!!item.phone && (
                         <Text
-                          style={
-                            styles.customerPhone
-                          }>
+                          style={[
+                            styles.customerPhone,
+                            {
+                              color:
+                                colors.textSecondary,
+                            },
+                          ]}>
                           {item.phone}
                         </Text>
                       )}
@@ -287,7 +346,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     fontSize: 15,
     fontWeight: '600',
-    color: Colors.textPrimary,
     textAlign: 'right',
   },
 
@@ -296,8 +354,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: Colors.border,
-    backgroundColor: Colors.surface,
     flexDirection: 'row-reverse',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -306,18 +362,12 @@ const styles = StyleSheet.create({
   selectorText: {
     flex: 1,
     fontSize: 16,
-    color: Colors.textPrimary,
     textAlign: 'right',
-  },
-
-  placeholder: {
-    color: Colors.textSecondary,
   },
 
   arrow: {
     marginRight: 12,
     fontSize: 11,
-    color: Colors.textSecondary,
   },
 
   overlay: {
@@ -330,7 +380,6 @@ const styles = StyleSheet.create({
   modal: {
     maxHeight: '85%',
     minHeight: '55%',
-    backgroundColor: Colors.surface,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 20,
@@ -346,22 +395,17 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: Colors.textPrimary,
   },
 
   closeText: {
     fontSize: 20,
-    color: Colors.textSecondary,
   },
 
   searchInput: {
     minHeight: 50,
     paddingHorizontal: 14,
     borderWidth: 1,
-    borderColor: Colors.border,
     borderRadius: 12,
-    color: Colors.textPrimary,
-    backgroundColor: Colors.background,
     marginBottom: 12,
     fontSize: 15,
   },
@@ -370,14 +414,12 @@ const styles = StyleSheet.create({
     minHeight: 48,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: Colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 10,
   },
 
   addCustomerText: {
-    color: Colors.primary,
     fontSize: 15,
     fontWeight: '700',
   },
@@ -385,27 +427,23 @@ const styles = StyleSheet.create({
   customerItem: {
     paddingVertical: 14,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
   },
 
   customerName: {
     fontSize: 16,
     fontWeight: '600',
-    color: Colors.textPrimary,
     textAlign: 'right',
   },
 
   customerPhone: {
     marginTop: 4,
     fontSize: 13,
-    color: Colors.textSecondary,
     textAlign: 'right',
   },
 
   emptyText: {
     paddingVertical: 30,
     textAlign: 'center',
-    color: Colors.textSecondary,
   },
 
   backToCustomers: {
@@ -414,14 +452,12 @@ const styles = StyleSheet.create({
   },
 
   backToCustomersText: {
-    color: Colors.primary,
     fontSize: 14,
     fontWeight: '600',
   },
 
   errorText: {
     marginTop: 10,
-    color: Colors.danger,
     fontSize: 14,
     textAlign: 'right',
   },

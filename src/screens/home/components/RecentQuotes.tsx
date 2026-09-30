@@ -20,7 +20,7 @@ import type {
   NativeStackNavigationProp,
 } from '@react-navigation/native-stack';
 
-import {Colors} from '../../../constants/colors';
+import {useTheme} from '../../../context/ThemeContext';
 
 import {
   type Quote,
@@ -57,6 +57,7 @@ export default function RecentQuotes({
 }: Props) {
   const navigation =
     useNavigation<NavigationProp>();
+  const {colors} = useTheme();
 
   const formatAmount = (
     value?: number | string,
@@ -99,7 +100,11 @@ export default function RecentQuotes({
   return (
     <View>
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>
+        <Text
+          style={[
+            styles.sectionTitle,
+            {color: colors.textPrimary},
+          ]}>
           הצעות מחיר אחרונות
         </Text>
 
@@ -108,19 +113,38 @@ export default function RecentQuotes({
             navigation.navigate('Quotes')
           }
           activeOpacity={0.7}>
-          <Text style={styles.seeAll}>
+          <Text
+            style={[
+              styles.seeAll,
+              {color: colors.primary},
+            ]}>
             הצג הכל
           </Text>
         </TouchableOpacity>
       </View>
 
       {quotes.length === 0 ? (
-        <View style={styles.emptyContainer}>
-          <Text style={styles.emptyTitle}>
+        <View
+          style={[
+            styles.emptyContainer,
+            {
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
+            },
+          ]}>
+          <Text
+            style={[
+              styles.emptyTitle,
+              {color: colors.textPrimary},
+            ]}>
             אין הצעות מחיר עדיין
           </Text>
 
-          <Text style={styles.emptySubtitle}>
+          <Text
+            style={[
+              styles.emptySubtitle,
+              {color: colors.textSecondary},
+            ]}>
             הצעות המחיר האחרונות שלך
             יופיעו כאן.
           </Text>
@@ -129,7 +153,13 @@ export default function RecentQuotes({
         quotes.map(quote => (
           <TouchableOpacity
             key={quote.id}
-            style={styles.quoteCard}
+            style={[
+              styles.quoteCard,
+              {
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
+              },
+            ]}
             activeOpacity={0.8}
             onPress={() =>
               navigation.navigate(
@@ -141,7 +171,11 @@ export default function RecentQuotes({
             }>
 
             <View style={styles.quoteTopRow}>
-              <Text style={styles.quoteNumber}>
+              <Text
+                style={[
+                  styles.quoteNumber,
+                  {color: colors.textSecondary},
+                ]}>
                 {quote.quote_number}
               </Text>
 
@@ -150,30 +184,46 @@ export default function RecentQuotes({
               />
             </View>
 
-            <Text style={styles.quoteTitle}>
+            <Text
+              style={[
+                styles.quoteTitle,
+                {color: colors.textPrimary},
+              ]}>
               {quote.title ||
                 'הצעת מחיר ללא כותרת'}
             </Text>
 
             {quote.description ? (
               <Text
-                style={
-                  styles.quoteDescription
-                }
+                style={[
+                  styles.quoteDescription,
+                  {color: colors.textSecondary},
+                ]}
                 numberOfLines={2}>
                 {quote.description}
               </Text>
             ) : null}
 
-            <View style={styles.quoteBottomRow}>
-              <Text style={styles.quoteDate}>
+            <View
+              style={[
+                styles.quoteBottomRow,
+                {borderTopColor: colors.border},
+              ]}>
+              <Text
+                style={[
+                  styles.quoteDate,
+                  {color: colors.textSecondary},
+                ]}>
                 {formatDate(
                   quote.created_at,
                 )}
               </Text>
 
               <Text
-                style={styles.quoteAmount}>
+                style={[
+                  styles.quoteAmount,
+                  {color: colors.textPrimary},
+                ]}>
                 {formatAmount(
                   quote.total ??
                     quote.subtotal,
@@ -201,23 +251,18 @@ const styles =
     sectionTitle: {
       fontSize: 20,
       fontWeight: '700',
-      color: Colors.textPrimary,
       textAlign: 'right',
     },
 
     seeAll: {
       fontSize: 14,
       fontWeight: '600',
-      color: Colors.primary,
     },
 
     quoteCard: {
-      backgroundColor:
-        Colors.surface,
       borderRadius: 18,
       padding: 18,
       borderWidth: 1,
-      borderColor: Colors.border,
       marginBottom: 12,
     },
 
@@ -231,14 +276,12 @@ const styles =
     quoteNumber: {
       fontSize: 14,
       fontWeight: '600',
-      color: Colors.textSecondary,
     },
 
     quoteTitle: {
       marginTop: 14,
       fontSize: 18,
       fontWeight: '700',
-      color: Colors.textPrimary,
       textAlign: 'right',
     },
 
@@ -246,7 +289,6 @@ const styles =
       marginTop: 6,
       fontSize: 14,
       lineHeight: 20,
-      color: Colors.textSecondary,
       textAlign: 'right',
     },
 
@@ -254,8 +296,6 @@ const styles =
       marginTop: 18,
       paddingTop: 14,
       borderTopWidth: 1,
-      borderTopColor:
-        Colors.border,
       flexDirection: 'row-reverse',
       justifyContent:
         'space-between',
@@ -264,36 +304,29 @@ const styles =
 
     quoteDate: {
       fontSize: 13,
-      color: Colors.textSecondary,
     },
 
     quoteAmount: {
       fontSize: 18,
       fontWeight: '700',
-      color: Colors.textPrimary,
     },
 
     emptyContainer: {
-      backgroundColor:
-        Colors.surface,
       borderRadius: 18,
       paddingVertical: 32,
       paddingHorizontal: 20,
       borderWidth: 1,
-      borderColor: Colors.border,
       alignItems: 'center',
     },
 
     emptyTitle: {
       fontSize: 17,
       fontWeight: '700',
-      color: Colors.textPrimary,
     },
 
     emptySubtitle: {
       marginTop: 8,
       fontSize: 14,
-      color: Colors.textSecondary,
       textAlign: 'center',
     },
   });

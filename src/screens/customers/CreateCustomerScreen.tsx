@@ -16,14 +16,17 @@ import {
 } from '../../api/customersApi';
 
 import CustomerForm from './CustomerForm';
+
 import {useCustomers} from '../../context/CustomersContext';
+import {useTheme} from '../../context/ThemeContext';
 
 import BackButton from '../../components/ui/BackButton';
-import {Colors} from '../../constants/colors';
 
 export default function CreateCustomerScreen() {
   const navigation = useNavigation();
   const {addCustomer} = useCustomers();
+  const {colors} = useTheme();
+
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState('');
 
@@ -33,7 +36,9 @@ export default function CreateCustomerScreen() {
       setError('');
 
       const newCustomer = await createCustomer(data);
+
       addCustomer(newCustomer);
+
       navigation.goBack();
     } catch (err) {
       console.log('Create customer error:', err);
@@ -45,7 +50,11 @@ export default function CreateCustomerScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={[
+        styles.container,
+        {backgroundColor: colors.background},
+      ]}>
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
@@ -54,20 +63,39 @@ export default function CreateCustomerScreen() {
         <View style={styles.header}>
           <BackButton />
 
-          <Text style={styles.title}>
+          <Text
+            style={[
+              styles.title,
+              {color: colors.textPrimary},
+            ]}>
             לקוח חדש
           </Text>
 
           <View style={styles.headerPlaceholder} />
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.subtitle}>
+        <View
+          style={[
+            styles.card,
+            {
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
+            },
+          ]}>
+          <Text
+            style={[
+              styles.subtitle,
+              {color: colors.textPrimary},
+            ]}>
             פרטי הלקוח
           </Text>
 
           {error ? (
-            <Text style={styles.errorText}>
+            <Text
+              style={[
+                styles.errorText,
+                {color: colors.danger},
+              ]}>
               {error}
             </Text>
           ) : null}
@@ -86,7 +114,6 @@ export default function CreateCustomerScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
   },
 
   content: {
@@ -105,7 +132,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '700',
-    color: Colors.textPrimary,
   },
 
   headerPlaceholder: {
@@ -116,21 +142,17 @@ const styles = StyleSheet.create({
     padding: 18,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: Colors.border,
-    backgroundColor: Colors.surface,
   },
 
   subtitle: {
     marginBottom: 4,
     fontSize: 17,
     fontWeight: '700',
-    color: Colors.textPrimary,
     textAlign: 'right',
   },
 
   errorText: {
     marginTop: 12,
-    color: Colors.danger,
     fontSize: 14,
     textAlign: 'right',
   },

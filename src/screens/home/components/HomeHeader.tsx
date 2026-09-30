@@ -5,9 +5,11 @@ import {
   View,
 } from 'react-native';
 
-import {Colors} from '../../../constants/colors';
+import {useTheme} from '../../../context/ThemeContext';
 
 export default function HomeHeader() {
+  const {colors} = useTheme();
+
   const hour = new Date().getHours();
 
   let greeting = 'שלום';
@@ -22,11 +24,19 @@ export default function HomeHeader() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.greeting}>
+      <Text
+        style={[
+          styles.greeting,
+          {color: colors.textPrimary},
+        ]}>
         {greeting} 👋
       </Text>
 
-      <Text style={styles.businessName}>
+      <Text
+        style={[
+          styles.businessName,
+          {color: colors.textSecondary},
+        ]}>
         Omari LTD
       </Text>
     </View>
@@ -42,14 +52,12 @@ const styles = StyleSheet.create({
   greeting: {
     fontSize: 28,
     fontWeight: '700',
-    color: Colors.textPrimary,
     textAlign: 'right',
   },
 
   businessName: {
     marginTop: 6,
     fontSize: 15,
-    color: Colors.textSecondary,
     textAlign: 'right',
   },
 });

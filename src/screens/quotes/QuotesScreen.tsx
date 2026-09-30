@@ -1,34 +1,39 @@
 import React from 'react';
+
 import {
   ActivityIndicator,
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
-import {SafeAreaView,} from 'react-native-safe-area-context';
-import {TouchableOpacity,} from 'react-native';
-import {useNavigation,} from '@react-navigation/native';
-import type {NativeStackNavigationProp,} from '@react-navigation/native-stack';
 
-import {Colors} from '../../constants/colors';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import {useNavigation} from '@react-navigation/native';
+import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
+
 import {useQuotes} from '../../context/QuotesContext';
-import QuoteStatusBadge from '../../components/ui/QuoteStatusBadge';
-import type {MainStackParamList,} from '../../navigation/MainNavigator';
+import {useTheme} from '../../context/ThemeContext';
 
-type QuotesNavigationProp =NativeStackNavigationProp< MainStackParamList>;
+import QuoteStatusBadge from '../../components/ui/QuoteStatusBadge';
+
+import type {MainStackParamList} from '../../navigation/MainNavigator';
+
+type QuotesNavigationProp =
+  NativeStackNavigationProp<MainStackParamList>;
 
 export default function QuotesScreen() {
   const navigation = useNavigation<QuotesNavigationProp>();
+  const {colors} = useTheme();
+
   const {
     quotes,
     loading,
     error,
   } = useQuotes();
 
-  const formatAmount = (
-    value?: number | string,
-  ) => {
+  const formatAmount = (value?: number | string) => {
     const amount = Number(value ?? 0);
 
     if (Number.isNaN(amount)) {
@@ -53,22 +58,38 @@ export default function QuotesScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={[
+        styles.container,
+        {backgroundColor: colors.background},
+      ]}>
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}>
 
         <View style={styles.header}>
-          <Text style={styles.title}>
+          <Text
+            style={[
+              styles.title,
+              {color: colors.textPrimary},
+            ]}>
             הצעות מחיר
           </Text>
 
           <View style={styles.quoteCount}>
-            <Text style={styles.quoteCountValue}>
+            <Text
+              style={[
+                styles.quoteCountValue,
+                {color: colors.primary},
+              ]}>
               {quotes.length}
             </Text>
 
-            <Text style={styles.quoteCountLabel}>
+            <Text
+              style={[
+                styles.quoteCountLabel,
+                {color: colors.textSecondary},
+              ]}>
               הצעות
             </Text>
           </View>
@@ -78,26 +99,56 @@ export default function QuotesScreen() {
           <View style={styles.loadingContainer}>
             <ActivityIndicator
               size="large"
-              color={Colors.primary}
+              color={colors.primary}
             />
 
-            <Text style={styles.loadingText}>
+            <Text
+              style={[
+                styles.loadingText,
+                {color: colors.textSecondary},
+              ]}>
               טוען הצעות מחיר...
             </Text>
           </View>
         ) : error ? (
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>
+          <View
+            style={[
+              styles.errorContainer,
+              {
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
+              },
+            ]}>
+            <Text
+              style={[
+                styles.errorText,
+                {color: colors.danger},
+              ]}>
               {error}
             </Text>
           </View>
         ) : quotes.length === 0 ? (
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyTitle}>
+          <View
+            style={[
+              styles.emptyContainer,
+              {
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
+              },
+            ]}>
+            <Text
+              style={[
+                styles.emptyTitle,
+                {color: colors.textPrimary},
+              ]}>
               אין הצעות מחיר עדיין
             </Text>
 
-            <Text style={styles.emptySubtitle}>
+            <Text
+              style={[
+                styles.emptySubtitle,
+                {color: colors.textSecondary},
+              ]}>
               הצעות המחיר שלך יופיעו כאן.
             </Text>
           </View>
@@ -105,7 +156,13 @@ export default function QuotesScreen() {
           quotes.map(quote => (
             <TouchableOpacity
               key={quote.id}
-              style={styles.quoteCard}
+              style={[
+                styles.quoteCard,
+                {
+                  backgroundColor: colors.surface,
+                  borderColor: colors.border,
+                },
+              ]}
               activeOpacity={0.8}
               onPress={() =>
                 navigation.navigate(
@@ -114,36 +171,59 @@ export default function QuotesScreen() {
                     quoteId: quote.id,
                   },
                 )
-            }>
+              }>
 
               <View style={styles.quoteTopRow}>
-                <Text style={styles.quoteNumber}>
+                <Text
+                  style={[
+                    styles.quoteNumber,
+                    {color: colors.textSecondary},
+                  ]}>
                   {quote.quote_number}
                 </Text>
 
                 <QuoteStatusBadge status={quote.status} />
               </View>
 
-              <Text style={styles.quoteTitle}>
+              <Text
+                style={[
+                  styles.quoteTitle,
+                  {color: colors.textPrimary},
+                ]}>
                 {quote.title ||
                   'הצעת מחיר ללא כותרת'}
               </Text>
 
               {quote.description ? (
                 <Text
-                  style={styles.quoteDescription}
+                  style={[
+                    styles.quoteDescription,
+                    {color: colors.textSecondary},
+                  ]}
                   numberOfLines={2}>
                   {quote.description}
                 </Text>
               ) : null}
 
-              <View style={styles.quoteBottomRow}>
+              <View
+                style={[
+                  styles.quoteBottomRow,
+                  {borderTopColor: colors.border},
+                ]}>
                 <View>
-                  <Text style={styles.dateLabel}>
+                  <Text
+                    style={[
+                      styles.dateLabel,
+                      {color: colors.textSecondary},
+                    ]}>
                     תאריך
                   </Text>
 
-                  <Text style={styles.quoteDate}>
+                  <Text
+                    style={[
+                      styles.quoteDate,
+                      {color: colors.textPrimary},
+                    ]}>
                     {formatDate(
                       quote.created_at,
                     )}
@@ -151,11 +231,19 @@ export default function QuotesScreen() {
                 </View>
 
                 <View style={styles.amountContainer}>
-                  <Text style={styles.amountLabel}>
+                  <Text
+                    style={[
+                      styles.amountLabel,
+                      {color: colors.textSecondary},
+                    ]}>
                     סכום
                   </Text>
 
-                  <Text style={styles.quoteAmount}>
+                  <Text
+                    style={[
+                      styles.quoteAmount,
+                      {color: colors.textPrimary},
+                    ]}>
                     {formatAmount(
                       quote.total ??
                         quote.subtotal,
@@ -174,7 +262,6 @@ export default function QuotesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
   },
 
   content: {
@@ -191,7 +278,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: '700',
-    color: Colors.textPrimary,
     textAlign: 'right',
   },
 
@@ -203,13 +289,11 @@ const styles = StyleSheet.create({
   },
 
   quoteCountValue: {
-    color: Colors.primary,
     fontSize: 17,
     fontWeight: '700',
   },
 
   quoteCountLabel: {
-    color: Colors.textSecondary,
     fontSize: 14,
   },
 
@@ -222,52 +306,42 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 14,
-    color: Colors.textSecondary,
   },
 
   errorContainer: {
-    backgroundColor: Colors.surface,
     borderRadius: 18,
     padding: 20,
     borderWidth: 1,
-    borderColor: Colors.border,
   },
 
   errorText: {
-    color: Colors.danger,
     fontSize: 14,
     textAlign: 'right',
   },
 
   emptyContainer: {
-    backgroundColor: Colors.surface,
     borderRadius: 18,
     paddingVertical: 32,
     paddingHorizontal: 20,
     borderWidth: 1,
-    borderColor: Colors.border,
     alignItems: 'center',
   },
 
   emptyTitle: {
     fontSize: 17,
     fontWeight: '700',
-    color: Colors.textPrimary,
   },
 
   emptySubtitle: {
     marginTop: 8,
     fontSize: 14,
-    color: Colors.textSecondary,
     textAlign: 'center',
   },
 
   quoteCard: {
-    backgroundColor: Colors.surface,
     borderRadius: 18,
     padding: 18,
     borderWidth: 1,
-    borderColor: Colors.border,
     marginBottom: 12,
   },
 
@@ -280,14 +354,12 @@ const styles = StyleSheet.create({
   quoteNumber: {
     fontSize: 14,
     fontWeight: '600',
-    color: Colors.textSecondary,
   },
 
   quoteTitle: {
     marginTop: 14,
     fontSize: 18,
     fontWeight: '700',
-    color: Colors.textPrimary,
     textAlign: 'right',
   },
 
@@ -295,7 +367,6 @@ const styles = StyleSheet.create({
     marginTop: 6,
     fontSize: 14,
     lineHeight: 20,
-    color: Colors.textSecondary,
     textAlign: 'right',
   },
 
@@ -303,7 +374,6 @@ const styles = StyleSheet.create({
     marginTop: 18,
     paddingTop: 14,
     borderTopWidth: 1,
-    borderTopColor: Colors.border,
     flexDirection: 'row-reverse',
     justifyContent: 'space-between',
     alignItems: 'flex-end',
@@ -311,14 +381,12 @@ const styles = StyleSheet.create({
 
   dateLabel: {
     fontSize: 12,
-    color: Colors.textSecondary,
     textAlign: 'right',
   },
 
   quoteDate: {
     marginTop: 4,
     fontSize: 14,
-    color: Colors.textPrimary,
   },
 
   amountContainer: {
@@ -327,7 +395,6 @@ const styles = StyleSheet.create({
 
   amountLabel: {
     fontSize: 12,
-    color: Colors.textSecondary,
     textAlign: 'right',
   },
 
@@ -335,6 +402,5 @@ const styles = StyleSheet.create({
     marginTop: 4,
     fontSize: 18,
     fontWeight: '700',
-    color: Colors.textPrimary,
   },
 });

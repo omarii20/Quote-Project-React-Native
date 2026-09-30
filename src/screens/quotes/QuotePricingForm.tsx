@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 
-import {Colors} from '../../constants/colors';
+import {useTheme} from '../../context/ThemeContext';
 
 export type QuoteItemFormData = {
   description: string;
@@ -20,16 +20,19 @@ type Props = {
   pricingMethod: 'items' | 'manual';
 
   items: QuoteItemFormData[];
+
   onChangeItems: (
     items: QuoteItemFormData[],
   ) => void;
 
   additionalAmount: string;
+
   onChangeAdditionalAmount: (
     value: string,
   ) => void;
 
   manualSubtotal: string;
+
   onChangeManualSubtotal: (
     value: string,
   ) => void;
@@ -44,6 +47,8 @@ export default function QuotePricingForm({
   manualSubtotal,
   onChangeManualSubtotal,
 }: Props) {
+  const {colors} = useTheme();
+
   const updateItem = (
     index: number,
     field: keyof QuoteItemFormData,
@@ -94,28 +99,50 @@ export default function QuotePricingForm({
   if (pricingMethod === 'manual') {
     return (
       <View style={styles.container}>
-        <Text style={styles.sectionTitle}>
+        <Text
+          style={[
+            styles.sectionTitle,
+            {color: colors.textPrimary},
+          ]}>
           מחיר ההצעה
         </Text>
 
-        <Text style={styles.label}>
+        <Text
+          style={[
+            styles.label,
+            {color: colors.textPrimary},
+          ]}>
           סכום ידני *
         </Text>
 
-        <View style={styles.priceInputContainer}>
-          <Text style={styles.currency}>
+        <View
+          style={[
+            styles.priceInputContainer,
+            {
+              borderColor: colors.border,
+              backgroundColor: colors.surface,
+            },
+          ]}>
+          <Text
+            style={[
+              styles.currency,
+              {color: colors.textSecondary},
+            ]}>
             ₪
           </Text>
 
           <TextInput
-            style={styles.priceInput}
+            style={[
+              styles.priceInput,
+              {color: colors.textPrimary},
+            ]}
             value={manualSubtotal}
             onChangeText={
               onChangeManualSubtotal
             }
             placeholder="0"
             placeholderTextColor={
-              Colors.textSecondary
+              colors.textSecondary
             }
             keyboardType="decimal-pad"
             textAlign="right"
@@ -127,7 +154,11 @@ export default function QuotePricingForm({
 
   return (
     <View style={styles.container}>
-      <Text style={styles.sectionTitle}>
+      <Text
+        style={[
+          styles.sectionTitle,
+          {color: colors.textPrimary},
+        ]}>
         פריטים
       </Text>
 
@@ -138,9 +169,19 @@ export default function QuotePricingForm({
         return (
           <View
             key={index}
-            style={styles.itemCard}>
+            style={[
+              styles.itemCard,
+              {
+                borderColor: colors.border,
+                backgroundColor: colors.surface,
+              },
+            ]}>
             <View style={styles.itemHeader}>
-              <Text style={styles.itemTitle}>
+              <Text
+                style={[
+                  styles.itemTitle,
+                  {color: colors.textPrimary},
+                ]}>
                 פריט {index + 1}
               </Text>
 
@@ -151,21 +192,33 @@ export default function QuotePricingForm({
                     removeItem(index)
                   }>
                   <Text
-                    style={
-                      styles.removeText
-                    }>
+                    style={[
+                      styles.removeText,
+                      {color: colors.danger},
+                    ]}>
                     הסר
                   </Text>
                 </TouchableOpacity>
               )}
             </View>
 
-            <Text style={styles.label}>
+            <Text
+              style={[
+                styles.label,
+                {color: colors.textPrimary},
+              ]}>
               תיאור *
             </Text>
 
             <TextInput
-              style={styles.input}
+              style={[
+                styles.input,
+                {
+                  borderColor: colors.border,
+                  backgroundColor: colors.background,
+                  color: colors.textPrimary,
+                },
+              ]}
               value={item.description}
               onChangeText={value =>
                 updateItem(
@@ -176,22 +229,30 @@ export default function QuotePricingForm({
               }
               placeholder="תיאור הפריט"
               placeholderTextColor={
-                Colors.textSecondary
+                colors.textSecondary
               }
               textAlign="right"
             />
 
             <View style={styles.priceRow}>
-              <View
-                style={
-                  styles.priceField
-                }>
-                <Text style={styles.label}>
+              <View style={styles.priceField}>
+                <Text
+                  style={[
+                    styles.label,
+                    {color: colors.textPrimary},
+                  ]}>
                   כמות
                 </Text>
 
                 <TextInput
-                  style={styles.input}
+                  style={[
+                    styles.input,
+                    {
+                      borderColor: colors.border,
+                      backgroundColor: colors.background,
+                      color: colors.textPrimary,
+                    },
+                  ]}
                   value={item.quantity}
                   onChangeText={value =>
                     updateItem(
@@ -203,22 +264,30 @@ export default function QuotePricingForm({
                   keyboardType="decimal-pad"
                   placeholder="1"
                   placeholderTextColor={
-                    Colors.textSecondary
+                    colors.textSecondary
                   }
                   textAlign="right"
                 />
               </View>
 
-              <View
-                style={
-                  styles.priceField
-                }>
-                <Text style={styles.label}>
+              <View style={styles.priceField}>
+                <Text
+                  style={[
+                    styles.label,
+                    {color: colors.textPrimary},
+                  ]}>
                   מחיר ליחידה
                 </Text>
 
                 <TextInput
-                  style={styles.input}
+                  style={[
+                    styles.input,
+                    {
+                      borderColor: colors.border,
+                      backgroundColor: colors.background,
+                      color: colors.textPrimary,
+                    },
+                  ]}
                   value={item.unitPrice}
                   onChangeText={value =>
                     updateItem(
@@ -230,19 +299,31 @@ export default function QuotePricingForm({
                   keyboardType="decimal-pad"
                   placeholder="0"
                   placeholderTextColor={
-                    Colors.textSecondary
+                    colors.textSecondary
                   }
                   textAlign="right"
                 />
               </View>
             </View>
 
-            <View style={styles.itemTotalRow}>
-              <Text style={styles.totalLabel}>
+            <View
+              style={[
+                styles.itemTotalRow,
+                {borderTopColor: colors.border},
+              ]}>
+              <Text
+                style={[
+                  styles.totalLabel,
+                  {color: colors.textSecondary},
+                ]}>
                 סה״כ פריט
               </Text>
 
-              <Text style={styles.totalValue}>
+              <Text
+                style={[
+                  styles.totalValue,
+                  {color: colors.textPrimary},
+                ]}>
                 ₪{total.toFixed(2)}
               </Text>
             </View>
@@ -251,25 +332,50 @@ export default function QuotePricingForm({
       })}
 
       <TouchableOpacity
-        style={styles.addItemButton}
+        style={[
+          styles.addItemButton,
+          {borderColor: colors.primary},
+        ]}
         activeOpacity={0.8}
         onPress={addItem}>
-        <Text style={styles.addItemText}>
+        <Text
+          style={[
+            styles.addItemText,
+            {color: colors.primary},
+          ]}>
           + הוסף פריט
         </Text>
       </TouchableOpacity>
 
-      <Text style={styles.label}>
+      <Text
+        style={[
+          styles.label,
+          {color: colors.textPrimary},
+        ]}>
         סכום נוסף
       </Text>
 
-      <View style={styles.priceInputContainer}>
-        <Text style={styles.currency}>
+      <View
+        style={[
+          styles.priceInputContainer,
+          {
+            borderColor: colors.border,
+            backgroundColor: colors.surface,
+          },
+        ]}>
+        <Text
+          style={[
+            styles.currency,
+            {color: colors.textSecondary},
+          ]}>
           ₪
         </Text>
 
         <TextInput
-          style={styles.priceInput}
+          style={[
+            styles.priceInput,
+            {color: colors.textPrimary},
+          ]}
           value={additionalAmount}
           onChangeText={
             onChangeAdditionalAmount
@@ -277,13 +383,17 @@ export default function QuotePricingForm({
           keyboardType="decimal-pad"
           placeholder="0"
           placeholderTextColor={
-            Colors.textSecondary
+            colors.textSecondary
           }
           textAlign="right"
         />
       </View>
 
-      <Text style={styles.helperText}>
+      <Text
+        style={[
+          styles.helperText,
+          {color: colors.textSecondary},
+        ]}>
         סכום נוסף יתווסף לסכום הפריטים
       </Text>
     </View>
@@ -299,7 +409,6 @@ const styles = StyleSheet.create({
     marginBottom: 14,
     fontSize: 19,
     fontWeight: '700',
-    color: Colors.textPrimary,
     textAlign: 'right',
   },
 
@@ -308,8 +417,6 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: Colors.border,
-    backgroundColor: Colors.surface,
   },
 
   itemHeader: {
@@ -322,13 +429,11 @@ const styles = StyleSheet.create({
   itemTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: Colors.textPrimary,
   },
 
   removeText: {
     fontSize: 14,
     fontWeight: '600',
-    color: Colors.danger,
   },
 
   label: {
@@ -336,7 +441,6 @@ const styles = StyleSheet.create({
     marginBottom: 7,
     fontSize: 14,
     fontWeight: '600',
-    color: Colors.textPrimary,
     textAlign: 'right',
   },
 
@@ -345,9 +449,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: Colors.border,
-    backgroundColor: Colors.background,
-    color: Colors.textPrimary,
     fontSize: 15,
   },
 
@@ -364,7 +465,6 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingTop: 14,
     borderTopWidth: 1,
-    borderTopColor: Colors.border,
     flexDirection: 'row-reverse',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -372,20 +472,17 @@ const styles = StyleSheet.create({
 
   totalLabel: {
     fontSize: 14,
-    color: Colors.textSecondary,
   },
 
   totalValue: {
     fontSize: 17,
     fontWeight: '700',
-    color: Colors.textPrimary,
   },
 
   addItemButton: {
     minHeight: 50,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: Colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
@@ -394,7 +491,6 @@ const styles = StyleSheet.create({
   addItemText: {
     fontSize: 15,
     fontWeight: '700',
-    color: Colors.primary,
   },
 
   priceInputContainer: {
@@ -402,8 +498,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: Colors.border,
-    backgroundColor: Colors.surface,
     flexDirection: 'row-reverse',
     alignItems: 'center',
   },
@@ -411,20 +505,17 @@ const styles = StyleSheet.create({
   priceInput: {
     flex: 1,
     fontSize: 16,
-    color: Colors.textPrimary,
   },
 
   currency: {
     marginLeft: 8,
     fontSize: 16,
     fontWeight: '600',
-    color: Colors.textSecondary,
   },
 
   helperText: {
     marginTop: 6,
     fontSize: 12,
-    color: Colors.textSecondary,
     textAlign: 'right',
   },
 });

@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 
-import {Colors} from '../../constants/colors';
+import {useTheme} from '../../context/ThemeContext';
 
 export type PricingMethod =
   | 'items'
@@ -40,28 +40,49 @@ export default function QuoteDetailsForm({
   onChangeDescription,
   onChangePricingMethod,
 }: Props) {
+  const {colors} = useTheme();
+
   return (
     <View style={styles.container}>
-      <Text style={styles.sectionTitle}>
+      <Text
+        style={[
+          styles.sectionTitle,
+          {color: colors.textPrimary},
+        ]}>
         פרטי ההצעה
       </Text>
 
-      <Text style={styles.label}>
+      <Text
+        style={[
+          styles.label,
+          {color: colors.textPrimary},
+        ]}>
         כותרת
       </Text>
 
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          {
+            borderColor: colors.border,
+            backgroundColor: colors.surface,
+            color: colors.textPrimary,
+          },
+        ]}
         value={title}
         onChangeText={onChangeTitle}
         placeholder="לדוגמה: פיתוח אתר אינטרנט"
         placeholderTextColor={
-          Colors.textSecondary
+          colors.textSecondary
         }
         textAlign="right"
       />
 
-      <Text style={styles.label}>
+      <Text
+        style={[
+          styles.label,
+          {color: colors.textPrimary},
+        ]}>
         תיאור
       </Text>
 
@@ -69,6 +90,11 @@ export default function QuoteDetailsForm({
         style={[
           styles.input,
           styles.descriptionInput,
+          {
+            borderColor: colors.border,
+            backgroundColor: colors.surface,
+            color: colors.textPrimary,
+          },
         ]}
         value={description}
         onChangeText={
@@ -76,14 +102,18 @@ export default function QuoteDetailsForm({
         }
         placeholder="תיאור ההצעה"
         placeholderTextColor={
-          Colors.textSecondary
+          colors.textSecondary
         }
         multiline
         textAlign="right"
         textAlignVertical="top"
       />
 
-      <Text style={styles.label}>
+      <Text
+        style={[
+          styles.label,
+          {color: colors.textPrimary},
+        ]}>
         שיטת תמחור
       </Text>
 
@@ -91,8 +121,16 @@ export default function QuoteDetailsForm({
         <TouchableOpacity
           style={[
             styles.pricingButton,
-            pricingMethod === 'items' &&
-              styles.pricingButtonSelected,
+            {
+              borderColor:
+                pricingMethod === 'items'
+                  ? colors.primary
+                  : colors.border,
+              backgroundColor:
+                pricingMethod === 'items'
+                  ? colors.surfaceSecondary
+                  : colors.surface,
+            },
           ]}
           activeOpacity={0.8}
           onPress={() =>
@@ -103,6 +141,12 @@ export default function QuoteDetailsForm({
           <Text
             style={[
               styles.pricingButtonText,
+              {
+                color:
+                  pricingMethod === 'items'
+                    ? colors.primary
+                    : colors.textSecondary,
+              },
               pricingMethod === 'items' &&
                 styles.pricingButtonTextSelected,
             ]}>
@@ -113,8 +157,16 @@ export default function QuoteDetailsForm({
         <TouchableOpacity
           style={[
             styles.pricingButton,
-            pricingMethod === 'manual' &&
-              styles.pricingButtonSelected,
+            {
+              borderColor:
+                pricingMethod === 'manual'
+                  ? colors.primary
+                  : colors.border,
+              backgroundColor:
+                pricingMethod === 'manual'
+                  ? colors.surfaceSecondary
+                  : colors.surface,
+            },
           ]}
           activeOpacity={0.8}
           onPress={() =>
@@ -125,6 +177,12 @@ export default function QuoteDetailsForm({
           <Text
             style={[
               styles.pricingButtonText,
+              {
+                color:
+                  pricingMethod === 'manual'
+                    ? colors.primary
+                    : colors.textSecondary,
+              },
               pricingMethod === 'manual' &&
                 styles.pricingButtonTextSelected,
             ]}>
@@ -145,7 +203,6 @@ const styles = StyleSheet.create({
     marginBottom: 14,
     fontSize: 19,
     fontWeight: '700',
-    color: Colors.textPrimary,
     textAlign: 'right',
   },
 
@@ -154,7 +211,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     fontSize: 14,
     fontWeight: '600',
-    color: Colors.textPrimary,
     textAlign: 'right',
   },
 
@@ -163,9 +219,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: Colors.border,
-    backgroundColor: Colors.surface,
-    color: Colors.textPrimary,
     fontSize: 15,
   },
 
@@ -184,25 +237,16 @@ const styles = StyleSheet.create({
     minHeight: 52,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: Colors.border,
-    backgroundColor: Colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-
-  pricingButtonSelected: {
-    borderColor: Colors.primary,
-    backgroundColor: '#EEF2FF',
   },
 
   pricingButtonText: {
     fontSize: 15,
     fontWeight: '600',
-    color: Colors.textSecondary,
   },
 
   pricingButtonTextSelected: {
-    color: Colors.primary,
     fontWeight: '700',
   },
 });

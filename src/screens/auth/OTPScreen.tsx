@@ -1,4 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
+
 import {
   ActivityIndicator,
   StyleSheet,
@@ -7,20 +8,25 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SafeAreaView} from 'react-native-safe-area-context';
+
+import {SafeAreaView} from 'react-native-safe-area-context';
 
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import type {AuthStackParamList} from '../../navigation/AuthNavigator';
-import {Colors} from '../../constants/colors';
+
 import {useAuth} from '../../context/AuthContext';
+import {useTheme} from '../../context/ThemeContext';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'OTP'>;
 
 const OTP_LENGTH = 6;
 
 export default function OTPScreen({navigation, route}: Props) {
+  const {colors} = useTheme();
   const {verifyOTP} = useAuth();
+
   const {phone} = route.params;
+
   const [otp, setOtp] = useState('');
   const [seconds, setSeconds] = useState(25);
   const [isVerifying, setIsVerifying] = useState(false);
@@ -104,24 +110,48 @@ export default function OTPScreen({navigation, route}: Props) {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView
+      style={[
+        styles.safeArea,
+        {backgroundColor: colors.background},
+      ]}>
       <View style={styles.container}>
         <TouchableOpacity
           style={styles.backButton}
           disabled={isVerifying}
           activeOpacity={0.7}
           onPress={() => navigation.goBack()}>
-          <Text style={styles.backText}>‹</Text>
+          <Text
+            style={[
+              styles.backText,
+              {color: colors.textPrimary},
+            ]}>
+            ‹
+          </Text>
         </TouchableOpacity>
 
         <View style={styles.header}>
-          <Text style={styles.title}>אימות מספר טלפון</Text>
+          <Text
+            style={[
+              styles.title,
+              {color: colors.textPrimary},
+            ]}>
+            אימות מספר טלפון
+          </Text>
 
-          <Text style={styles.description}>
+          <Text
+            style={[
+              styles.description,
+              {color: colors.textSecondary},
+            ]}>
             שלחנו קוד אימות ל:
           </Text>
 
-          <Text style={styles.phone}>
+          <Text
+            style={[
+              styles.phone,
+              {color: colors.textPrimary},
+            ]}>
             {formatPhone(phone)}
           </Text>
 
@@ -129,7 +159,11 @@ export default function OTPScreen({navigation, route}: Props) {
             disabled={isVerifying}
             activeOpacity={0.7}
             onPress={() => navigation.goBack()}>
-            <Text style={styles.changePhone}>
+            <Text
+              style={[
+                styles.changePhone,
+                {color: colors.primary},
+              ]}>
               שינוי מספר
             </Text>
           </TouchableOpacity>
@@ -148,19 +182,30 @@ export default function OTPScreen({navigation, route}: Props) {
               index === otp.length &&
               otp.length < OTP_LENGTH;
 
-            return (
-              <View
-                key={index}
-                style={[
-                  styles.otpBox,
-                  isActive && styles.otpBoxActive,
-                  error !== '' && styles.otpBoxError,
-                ]}>
-                <Text style={styles.otpDigit}>
-                  {digit}
-                </Text>
-              </View>
-            );
+              return (
+                <View
+                  key={index}
+                  style={[
+                    styles.otpBox,
+                    {
+                      borderColor: error
+                        ? colors.danger
+                        : isActive
+                          ? colors.primary
+                          : colors.border,
+                      backgroundColor: colors.surface,
+                    },
+                    isActive && styles.otpBoxActive,
+                  ]}>
+                  <Text
+                    style={[
+                      styles.otpDigit,
+                      {color: colors.textPrimary},
+                    ]}>
+                    {digit}
+                  </Text>
+                </View>
+);
           })}
         </TouchableOpacity>
 
@@ -180,23 +225,35 @@ export default function OTPScreen({navigation, route}: Props) {
           <View style={styles.loadingContainer}>
             <ActivityIndicator
               size="small"
-              color={Colors.primary}
+              color={colors.primary}
             />
 
-            <Text style={styles.loadingText}>
+            <Text
+              style={[
+                styles.loadingText,
+                {color: colors.textSecondary},
+              ]}>
               מאמת קוד...
             </Text>
           </View>
         )}
 
         {!!error && (
-          <Text style={styles.errorText}>
+          <Text
+            style={[
+              styles.errorText,
+              {color: colors.danger},
+            ]}>
             {error}
           </Text>
         )}
 
         <View style={styles.resendContainer}>
-          <Text style={styles.resendText}>
+          <Text
+            style={[
+              styles.resendText,
+              {color: colors.textSecondary},
+            ]}>
             לא קיבלת קוד?
           </Text>
 
@@ -207,8 +264,12 @@ export default function OTPScreen({navigation, route}: Props) {
             <Text
               style={[
                 styles.resendAction,
-                (seconds > 0 || isVerifying) &&
-                  styles.resendDisabled,
+                {
+                  color:
+                    seconds > 0 || isVerifying
+                      ? colors.textSecondary
+                      : colors.primary,
+                },
               ]}>
               {seconds > 0
                 ? `שלח שוב (${String(seconds).padStart(2, '0')})`
@@ -224,7 +285,6 @@ export default function OTPScreen({navigation, route}: Props) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Colors.background,
   },
 
   container: {
@@ -241,7 +301,6 @@ const styles = StyleSheet.create({
 
   backText: {
     fontSize: 38,
-    color: Colors.textPrimary,
   },
 
   header: {
@@ -252,14 +311,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: '800',
-    color: Colors.textPrimary,
     textAlign: 'center',
   },
 
   description: {
     marginTop: 24,
     fontSize: 15,
-    color: Colors.textSecondary,
     textAlign: 'center',
   },
 
@@ -267,7 +324,6 @@ const styles = StyleSheet.create({
     marginTop: 6,
     fontSize: 20,
     fontWeight: '800',
-    color: Colors.textPrimary,
     textAlign: 'center',
   },
 
@@ -275,7 +331,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 15,
     fontWeight: '700',
-    color: Colors.primary,
     textAlign: 'center',
   },
 
@@ -290,26 +345,18 @@ const styles = StyleSheet.create({
     width: 54,
     height: 58,
     borderWidth: 1,
-    borderColor: Colors.border,
     borderRadius: 10,
-    backgroundColor: Colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   otpBoxActive: {
-    borderColor: Colors.primary,
     borderWidth: 2,
-  },
-
-  otpBoxError: {
-    borderColor: Colors.danger,
   },
 
   otpDigit: {
     fontSize: 24,
     fontWeight: '700',
-    color: Colors.textPrimary,
   },
 
   hiddenInput: {
@@ -329,14 +376,12 @@ const styles = StyleSheet.create({
 
   loadingText: {
     fontSize: 14,
-    color: Colors.textSecondary,
   },
 
   errorText: {
     marginTop: 16,
     fontSize: 14,
     fontWeight: '600',
-    color: Colors.danger,
     textAlign: 'center',
   },
 
@@ -347,17 +392,11 @@ const styles = StyleSheet.create({
 
   resendText: {
     fontSize: 14,
-    color: Colors.textSecondary,
   },
 
   resendAction: {
     marginTop: 6,
     fontSize: 14,
     fontWeight: '700',
-    color: Colors.primary,
-  },
-
-  resendDisabled: {
-    color: Colors.textSecondary,
   },
 });

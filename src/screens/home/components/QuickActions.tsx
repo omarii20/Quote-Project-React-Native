@@ -10,22 +10,30 @@ import {useNavigation} from '@react-navigation/native';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import type {MainStackParamList} from '../../../navigation/MainNavigator';
 
-import {Colors} from '../../../constants/colors';
+import {useTheme} from '../../../context/ThemeContext';
 
 type NavigationProp = NativeStackNavigationProp<MainStackParamList>;
 
 export default function QuickActions() {
   const navigation = useNavigation<NavigationProp>();
+  const {colors} = useTheme();
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>
+      <Text
+        style={[
+          styles.title,
+          {color: colors.textPrimary},
+        ]}>
         פעולות מהירות
       </Text>
 
       <View style={styles.actionsRow}>
         <TouchableOpacity
-          style={styles.primaryButton}
+          style={[
+            styles.primaryButton,
+            {backgroundColor: colors.primary},
+          ]}
           activeOpacity={0.8}
           onPress={() =>
             navigation.navigate('CreateQuote')
@@ -36,12 +44,22 @@ export default function QuickActions() {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.secondaryButton}
+          style={[
+            styles.secondaryButton,
+            {
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
+            },
+          ]}
           activeOpacity={0.8}
           onPress={() =>
             navigation.navigate('CreateCustomer')
           }>
-          <Text style={styles.secondaryButtonText}>
+          <Text
+            style={[
+              styles.secondaryButtonText,
+              {color: colors.primary},
+            ]}>
             + לקוח חדש
           </Text>
         </TouchableOpacity>
@@ -59,7 +77,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     fontSize: 20,
     fontWeight: '700',
-    color: Colors.textPrimary,
     textAlign: 'right',
   },
 
@@ -70,7 +87,6 @@ const styles = StyleSheet.create({
 
   primaryButton: {
     flex: 1,
-    backgroundColor: Colors.primary,
     borderRadius: 14,
     paddingVertical: 14,
     alignItems: 'center',
@@ -84,16 +100,13 @@ const styles = StyleSheet.create({
 
   secondaryButton: {
     flex: 1,
-    backgroundColor: Colors.surface,
     borderRadius: 14,
     paddingVertical: 14,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: Colors.border,
   },
 
   secondaryButtonText: {
-    color: Colors.primary,
     fontSize: 15,
     fontWeight: '700',
   },

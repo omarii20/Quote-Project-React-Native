@@ -31,8 +31,6 @@ import type {
   MainStackParamList,
 } from '../../navigation/MainNavigator';
 
-import {Colors} from '../../constants/colors';
-
 import BackButton from '../../components/ui/BackButton';
 
 import QuoteDetailsForm, {
@@ -57,6 +55,7 @@ import {
 } from '../../api/quotesApi';
 
 import {useQuotes} from '../../context/QuotesContext';
+import {useTheme} from '../../context/ThemeContext';
 
 import {validateQuote} from '../../validation/quoteValidation';
 
@@ -75,6 +74,8 @@ type EditQuoteNavigationProp =
 export default function EditQuoteScreen() {
   const route = useRoute<EditQuoteRouteProp>();
   const navigation = useNavigation<EditQuoteNavigationProp>();
+
+  const {colors} = useTheme();
 
   const {quoteId} = route.params;
 
@@ -247,19 +248,19 @@ export default function EditQuoteScreen() {
     setSaveError('');
 
     const validation = validateQuote({
-        customerId: quote.customer_id,
-        pricingMethod,
-        items,
-        additionalAmount,
-        manualSubtotal,
-        discountType,
-        discountValue,
-        vatRate,
+      customerId: quote.customer_id,
+      pricingMethod,
+      items,
+      additionalAmount,
+      manualSubtotal,
+      discountType,
+      discountValue,
+      vatRate,
     });
 
     if (!validation.isValid) {
-        setSaveError(validation.error);
-        return;
+      setSaveError(validation.error);
+      return;
     }
 
     try {
@@ -284,15 +285,28 @@ export default function EditQuoteScreen() {
       const payload: UpdateQuoteData = {
         customer_id: quote.customer_id,
         title: title.trim() || undefined,
-        description: description.trim() || undefined,
+        description:
+          description.trim() || undefined,
         pricing_method: pricingMethod,
-        manual_subtotal: pricingMethod === 'manual' ? Number(manualSubtotal) : null,
-        additional_amount: pricingMethod === 'items' ? Number(additionalAmount) || 0 : 0,
-        discount_type: discountType === 'none' ? null : discountType,
-        discount_value: discountType === 'none' ? 0 : Number(discountValue),
-        vat_rate:Number(vatRate),
+        manual_subtotal:
+          pricingMethod === 'manual'
+            ? Number(manualSubtotal)
+            : null,
+        additional_amount:
+          pricingMethod === 'items'
+            ? Number(additionalAmount) || 0
+            : 0,
+        discount_type:
+          discountType === 'none'
+            ? null
+            : discountType,
+        discount_value:
+          discountType === 'none'
+            ? 0
+            : Number(discountValue),
+        vat_rate: Number(vatRate),
         valid_until: formattedValidUntil,
-        notes:notes.trim() || undefined,
+        notes: notes.trim() || undefined,
         items:
           pricingMethod === 'items'
             ? items.map(
@@ -321,9 +335,9 @@ export default function EditQuoteScreen() {
       };
 
       const updatedQuote = await updateQuoteApi(
-          quoteId,
-          payload,
-        );
+        quoteId,
+        payload,
+      );
 
       updateQuote(updatedQuote);
 
@@ -344,14 +358,22 @@ export default function EditQuoteScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView
+        style={[
+          styles.container,
+          {backgroundColor: colors.background},
+        ]}>
         <View style={styles.loadingContainer}>
           <ActivityIndicator
             size="large"
-            color={Colors.primary}
+            color={colors.primary}
           />
 
-          <Text style={styles.loadingText}>
+          <Text
+            style={[
+              styles.loadingText,
+              {color: colors.textSecondary},
+            ]}>
             טוען הצעת מחיר...
           </Text>
         </View>
@@ -361,16 +383,28 @@ export default function EditQuoteScreen() {
 
   if (loadError || !quote) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView
+        style={[
+          styles.container,
+          {backgroundColor: colors.background},
+        ]}>
         <View style={styles.header}>
           <BackButton />
 
-          <Text style={styles.title}>
+          <Text
+            style={[
+              styles.title,
+              {color: colors.textPrimary},
+            ]}>
             עריכת הצעת מחיר
           </Text>
         </View>
 
-        <Text style={styles.errorText}>
+        <Text
+          style={[
+            styles.errorText,
+            {color: colors.danger},
+          ]}>
           {loadError ||
             'הצעת המחיר לא נמצאה.'}
         </Text>
@@ -379,12 +413,20 @@ export default function EditQuoteScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={[
+        styles.container,
+        {backgroundColor: colors.background},
+      ]}>
 
       <View style={styles.header}>
         <BackButton />
 
-        <Text style={styles.title}>
+        <Text
+          style={[
+            styles.title,
+            {color: colors.textPrimary},
+          ]}>
           עריכת הצעת מחיר
         </Text>
       </View>
@@ -399,12 +441,27 @@ export default function EditQuoteScreen() {
         }
         keyboardShouldPersistTaps="handled">
 
-        <View style={styles.customerCard}>
-          <Text style={styles.customerLabel}>
+        <View
+          style={[
+            styles.customerCard,
+            {
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
+            },
+          ]}>
+          <Text
+            style={[
+              styles.customerLabel,
+              {color: colors.textSecondary},
+            ]}>
             לקוח
           </Text>
 
-          <Text style={styles.customerName}>
+          <Text
+            style={[
+              styles.customerName,
+              {color: colors.textPrimary},
+            ]}>
             {customerName ||
               'לקוח לא ידוע'}
           </Text>
@@ -481,17 +538,29 @@ export default function EditQuoteScreen() {
         />
 
         {saveError ? (
-          <Text style={styles.saveErrorText}>
+          <Text
+            style={[
+              styles.saveErrorText,
+              {color: colors.danger},
+            ]}>
             {saveError}
           </Text>
         ) : null}
 
       </ScrollView>
 
-      <View style={styles.bottomActions}>
+      <View
+        style={[
+          styles.bottomActions,
+          {
+            backgroundColor: colors.background,
+            borderTopColor: colors.border,
+          },
+        ]}>
         <TouchableOpacity
           style={[
             styles.saveButton,
+            {backgroundColor: colors.primary},
             saving &&
               styles.saveButtonDisabled,
           ]}
@@ -520,8 +589,6 @@ export default function EditQuoteScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor:
-      Colors.background,
     paddingHorizontal: 20,
     paddingTop: 10,
   },
@@ -536,7 +603,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 24,
     fontWeight: '700',
-    color: Colors.textPrimary,
     textAlign: 'right',
   },
 
@@ -557,13 +623,11 @@ const styles = StyleSheet.create({
 
   loadingText: {
     fontSize: 14,
-    color: Colors.textSecondary,
   },
 
   errorText: {
     marginTop: 28,
     fontSize: 14,
-    color: Colors.danger,
     textAlign: 'right',
   },
 
@@ -571,31 +635,25 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginBottom: 12,
     fontSize: 14,
-    color: Colors.danger,
     textAlign: 'right',
   },
 
   customerCard: {
     marginTop: 20,
-    backgroundColor:
-      Colors.surface,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: Colors.border,
     padding: 16,
     alignItems: 'flex-end',
   },
 
   customerLabel: {
     fontSize: 13,
-    color: Colors.textSecondary,
   },
 
   customerName: {
     marginTop: 5,
     fontSize: 17,
     fontWeight: '700',
-    color: Colors.textPrimary,
     textAlign: 'right',
   },
 
@@ -603,16 +661,11 @@ const styles = StyleSheet.create({
     paddingTop: 12,
     paddingBottom: 6,
     borderTopWidth: 1,
-    borderTopColor: Colors.border,
-    backgroundColor:
-      Colors.background,
   },
 
   saveButton: {
     height: 52,
     borderRadius: 16,
-    backgroundColor:
-      Colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },

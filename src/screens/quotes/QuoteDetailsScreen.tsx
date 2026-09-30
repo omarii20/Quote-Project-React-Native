@@ -42,7 +42,7 @@ import {
 } from '../../api/quotesApi';
 
 import {useQuotes} from '../../context/QuotesContext';
-import {Colors} from '../../constants/colors';
+import {useTheme} from '../../context/ThemeContext';
 
 import QuoteStatusBadge from '../../components/ui/QuoteStatusBadge';
 import BackButton from '../../components/ui/BackButton';
@@ -62,14 +62,16 @@ type QuoteDetailsNavigationProp =
 export default function QuoteDetailsScreen() {
   const route = useRoute<QuoteDetailsRouteProp>();
   const navigation = useNavigation<QuoteDetailsNavigationProp>();
+  const {colors} = useTheme();
 
   const {quoteId} = route.params;
-  
+
   const [quote, setQuote] = useState<Quote | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const {removeQuote} = useQuotes();
   const [deleting, setDeleting] = useState(false);
+
+  const {removeQuote} = useQuotes();
 
   useFocusEffect(
     useCallback(() => {
@@ -176,14 +178,22 @@ export default function QuoteDetailsScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView
+        style={[
+          styles.container,
+          {backgroundColor: colors.background},
+        ]}>
         <View style={styles.centerContainer}>
           <ActivityIndicator
             size="large"
-            color={Colors.primary}
+            color={colors.primary}
           />
 
-          <Text style={styles.loadingText}>
+          <Text
+            style={[
+              styles.loadingText,
+              {color: colors.textSecondary},
+            ]}>
             טוען פרטי הצעת מחיר...
           </Text>
         </View>
@@ -193,9 +203,17 @@ export default function QuoteDetailsScreen() {
 
   if (error || !quote) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView
+        style={[
+          styles.container,
+          {backgroundColor: colors.background},
+        ]}>
         <View style={styles.centerContainer}>
-          <Text style={styles.errorText}>
+          <Text
+            style={[
+              styles.errorText,
+              {color: colors.danger},
+            ]}>
             {error ||
               'הצעת המחיר לא נמצאה.'}
           </Text>
@@ -205,14 +223,22 @@ export default function QuoteDetailsScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={[
+        styles.container,
+        {backgroundColor: colors.background},
+      ]}>
 
       <View style={styles.header}>
         <BackButton />
 
         <View style={styles.headerContent}>
           <View style={styles.quoteInfoRow}>
-            <Text style={styles.quoteNumber}>
+            <Text
+              style={[
+                styles.quoteNumber,
+                {color: colors.textSecondary},
+              ]}>
               {quote.quote_number}
             </Text>
 
@@ -223,20 +249,23 @@ export default function QuoteDetailsScreen() {
         </View>
 
         <TouchableOpacity
-          style={styles.deleteIconButton}
+          style={[
+            styles.deleteIconButton,
+            {backgroundColor: colors.surfaceSecondary},
+          ]}
           activeOpacity={0.7}
           disabled={deleting}
           onPress={handleDeleteQuote}>
           {deleting ? (
             <ActivityIndicator
               size="small"
-              color={Colors.danger}
+              color={colors.danger}
             />
           ) : (
             <MaterialDesignIcons
               name="delete-outline"
               size={24}
-              color={Colors.danger}
+              color={colors.danger}
             />
           )}
         </TouchableOpacity>
@@ -252,20 +281,39 @@ export default function QuoteDetailsScreen() {
         }>
 
         <View style={styles.quoteHeading}>
-          <Text style={styles.title}>
+          <Text
+            style={[
+              styles.title,
+              {color: colors.textPrimary},
+            ]}>
             {quote.title ||
               'הצעת מחיר ללא כותרת'}
           </Text>
 
           {quote.description ? (
-            <Text style={styles.description}>
+            <Text
+              style={[
+                styles.description,
+                {color: colors.textSecondary},
+              ]}>
               {quote.description}
             </Text>
           ) : null}
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>
+        <View
+          style={[
+            styles.card,
+            {
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
+            },
+          ]}>
+          <Text
+            style={[
+              styles.cardTitle,
+              {color: colors.textPrimary},
+            ]}>
             פרטי הצעה
           </Text>
 
@@ -306,8 +354,19 @@ export default function QuoteDetailsScreen() {
           'items' &&
         quote.items &&
         quote.items.length > 0 ? (
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>
+          <View
+            style={[
+              styles.card,
+              {
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
+              },
+            ]}>
+            <Text
+              style={[
+                styles.cardTitle,
+                {color: colors.textPrimary},
+              ]}>
               פריטים
             </Text>
 
@@ -315,14 +374,18 @@ export default function QuoteDetailsScreen() {
               (item, index) => (
                 <View
                   key={item.id}
-                  style={
-                    styles.itemContainer
-                  }>
+                  style={[
+                    styles.itemContainer,
+                    {
+                      borderBottomColor: colors.border,
+                    },
+                  ]}>
 
                   <Text
-                    style={
-                      styles.itemTitle
-                    }>
+                    style={[
+                      styles.itemTitle,
+                      {color: colors.textPrimary},
+                    ]}>
                     {index + 1}.{' '}
                     {item.description}
                   </Text>
@@ -353,8 +416,19 @@ export default function QuoteDetailsScreen() {
           </View>
         ) : null}
 
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>
+        <View
+          style={[
+            styles.card,
+            {
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
+            },
+          ]}>
+          <Text
+            style={[
+              styles.cardTitle,
+              {color: colors.textPrimary},
+            ]}>
             סיכום כספי
           </Text>
 
@@ -406,9 +480,10 @@ export default function QuoteDetailsScreen() {
           />
 
           <View
-            style={
-              styles.totalDivider
-            }
+            style={[
+              styles.totalDivider,
+              {backgroundColor: colors.border},
+            ]}
           />
 
           <DetailRow
@@ -421,12 +496,27 @@ export default function QuoteDetailsScreen() {
         </View>
 
         {quote.notes ? (
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>
+          <View
+            style={[
+              styles.card,
+              {
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
+              },
+            ]}>
+            <Text
+              style={[
+                styles.cardTitle,
+                {color: colors.textPrimary},
+              ]}>
               הערות
             </Text>
 
-            <Text style={styles.notesText}>
+            <Text
+              style={[
+                styles.notesText,
+                {color: colors.textSecondary},
+              ]}>
               {quote.notes}
             </Text>
           </View>
@@ -435,9 +525,19 @@ export default function QuoteDetailsScreen() {
       </ScrollView>
 
       {canEdit ? (
-        <View style={styles.bottomActions}>
+        <View
+          style={[
+            styles.bottomActions,
+            {
+              backgroundColor: colors.background,
+              borderTopColor: colors.border,
+            },
+          ]}>
           <TouchableOpacity
-            style={styles.editButton}
+            style={[
+              styles.editButton,
+              {backgroundColor: colors.primary},
+            ]}
             activeOpacity={0.8}
             onPress={() =>
               navigation.navigate(
@@ -469,13 +569,19 @@ function DetailRow({
   value,
   strong = false,
 }: DetailRowProps) {
+  const {colors} = useTheme();
+
   return (
     <View style={styles.detailRow}>
       <Text
         style={[
           styles.detailLabel,
-          strong &&
-            styles.strongText,
+          {
+            color: strong
+              ? colors.textPrimary
+              : colors.textSecondary,
+          },
+          strong && styles.strongText,
         ]}>
         {label}
       </Text>
@@ -483,8 +589,12 @@ function DetailRow({
       <Text
         style={[
           styles.detailValue,
-          strong &&
-            styles.totalValue,
+          {
+            color: strong
+              ? colors.primary
+              : colors.textPrimary,
+          },
+          strong && styles.totalValue,
         ]}>
         {value}
       </Text>
@@ -495,7 +605,6 @@ function DetailRow({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
     paddingHorizontal: 20,
     paddingTop: 10,
   },
@@ -520,7 +629,6 @@ const styles = StyleSheet.create({
   quoteNumber: {
     fontSize: 16,
     fontWeight: '600',
-    color: Colors.textSecondary,
   },
 
   scrollView: {
@@ -539,7 +647,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 26,
     fontWeight: '700',
-    color: Colors.textPrimary,
     textAlign: 'right',
   },
 
@@ -547,7 +654,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
     fontSize: 15,
     lineHeight: 22,
-    color: Colors.textSecondary,
     textAlign: 'right',
   },
 
@@ -561,21 +667,17 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 14,
-    color: Colors.textSecondary,
   },
 
   errorText: {
     fontSize: 15,
-    color: Colors.danger,
     textAlign: 'center',
   },
 
   card: {
-    backgroundColor: Colors.surface,
     borderRadius: 18,
     padding: 18,
     borderWidth: 1,
-    borderColor: Colors.border,
     marginBottom: 14,
   },
 
@@ -583,7 +685,6 @@ const styles = StyleSheet.create({
     marginBottom: 14,
     fontSize: 17,
     fontWeight: '700',
-    color: Colors.textPrimary,
     textAlign: 'right',
   },
 
@@ -596,51 +697,43 @@ const styles = StyleSheet.create({
 
   detailLabel: {
     fontSize: 14,
-    color: Colors.textSecondary,
     textAlign: 'right',
   },
 
   detailValue: {
     fontSize: 14,
-    color: Colors.textPrimary,
     textAlign: 'left',
   },
 
   strongText: {
     fontWeight: '700',
-    color: Colors.textPrimary,
   },
 
   totalValue: {
     fontSize: 20,
     fontWeight: '700',
-    color: Colors.primary,
   },
 
   totalDivider: {
     height: 1,
-    backgroundColor: Colors.border,
     marginVertical: 10,
   },
 
   itemContainer: {
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
   },
 
   itemTitle: {
     marginBottom: 8,
     fontSize: 15,
     fontWeight: '700',
-    color: Colors.textPrimary,
     textAlign: 'right',
   },
 
   notesText: {
     fontSize: 14,
     lineHeight: 22,
-    color: Colors.textSecondary,
     textAlign: 'right',
   },
 
@@ -648,14 +741,11 @@ const styles = StyleSheet.create({
     paddingTop: 12,
     paddingBottom: 6,
     borderTopWidth: 1,
-    borderTopColor: Colors.border,
-    backgroundColor: Colors.background,
   },
 
   editButton: {
     height: 52,
     borderRadius: 16,
-    backgroundColor: Colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -672,6 +762,5 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FEE2E2',
   },
 });
