@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 
-import {Colors} from '../../constants/colors';
+import {useTheme} from '../../context/ThemeContext';
 
 export type DiscountType =
   | 'none'
@@ -45,6 +45,8 @@ export default function QuoteTotalsForm({
   vatRate,
   onChangeVatRate,
 }: Props) {
+  const {colors} = useTheme();
+
   const discountNumber =
     Number(discountValue) || 0;
 
@@ -80,13 +82,41 @@ export default function QuoteTotalsForm({
   const total =
     afterDiscount + vatAmount;
 
+  const getOptionStyle = (
+    type: DiscountType,
+  ) => ({
+    borderColor:
+      discountType === type
+        ? colors.primary
+        : colors.border,
+    backgroundColor:
+      discountType === type
+        ? colors.surfaceSecondary
+        : colors.surface,
+  });
+
+  const getOptionTextColor = (
+    type: DiscountType,
+  ) =>
+    discountType === type
+      ? colors.primary
+      : colors.textSecondary;
+
   return (
     <View style={styles.container}>
-      <Text style={styles.sectionTitle}>
+      <Text
+        style={[
+          styles.sectionTitle,
+          {color: colors.textPrimary},
+        ]}>
         הנחה ומע״מ
       </Text>
 
-      <Text style={styles.label}>
+      <Text
+        style={[
+          styles.label,
+          {color: colors.textPrimary},
+        ]}>
         הנחה
       </Text>
 
@@ -94,8 +124,7 @@ export default function QuoteTotalsForm({
         <TouchableOpacity
           style={[
             styles.optionButton,
-            discountType === 'none' &&
-              styles.optionButtonSelected,
+            getOptionStyle('none'),
           ]}
           activeOpacity={0.8}
           onPress={() =>
@@ -106,6 +135,12 @@ export default function QuoteTotalsForm({
           <Text
             style={[
               styles.optionText,
+              {
+                color:
+                  getOptionTextColor(
+                    'none',
+                  ),
+              },
               discountType === 'none' &&
                 styles.optionTextSelected,
             ]}>
@@ -116,8 +151,7 @@ export default function QuoteTotalsForm({
         <TouchableOpacity
           style={[
             styles.optionButton,
-            discountType === 'percent' &&
-              styles.optionButtonSelected,
+            getOptionStyle('percent'),
           ]}
           activeOpacity={0.8}
           onPress={() =>
@@ -128,6 +162,12 @@ export default function QuoteTotalsForm({
           <Text
             style={[
               styles.optionText,
+              {
+                color:
+                  getOptionTextColor(
+                    'percent',
+                  ),
+              },
               discountType === 'percent' &&
                 styles.optionTextSelected,
             ]}>
@@ -138,8 +178,7 @@ export default function QuoteTotalsForm({
         <TouchableOpacity
           style={[
             styles.optionButton,
-            discountType === 'fixed' &&
-              styles.optionButtonSelected,
+            getOptionStyle('fixed'),
           ]}
           activeOpacity={0.8}
           onPress={() =>
@@ -150,6 +189,12 @@ export default function QuoteTotalsForm({
           <Text
             style={[
               styles.optionText,
+              {
+                color:
+                  getOptionTextColor(
+                    'fixed',
+                  ),
+              },
               discountType === 'fixed' &&
                 styles.optionTextSelected,
             ]}>
@@ -160,28 +205,46 @@ export default function QuoteTotalsForm({
 
       {discountType !== 'none' && (
         <>
-          <Text style={styles.label}>
+          <Text
+            style={[
+              styles.label,
+              {color: colors.textPrimary},
+            ]}>
             {discountType === 'percent'
               ? 'אחוז הנחה'
               : 'סכום הנחה'}
           </Text>
 
-          <View style={styles.priceInputContainer}>
-            <Text style={styles.inputSuffix}>
+          <View
+            style={[
+              styles.priceInputContainer,
+              {
+                borderColor: colors.border,
+                backgroundColor: colors.surface,
+              },
+            ]}>
+            <Text
+              style={[
+                styles.inputSuffix,
+                {color: colors.textSecondary},
+              ]}>
               {discountType === 'percent'
                 ? '%'
                 : '₪'}
             </Text>
 
             <TextInput
-              style={styles.priceInput}
+              style={[
+                styles.priceInput,
+                {color: colors.textPrimary},
+              ]}
               value={discountValue}
               onChangeText={
                 onChangeDiscountValue
               }
               placeholder="0"
               placeholderTextColor={
-                Colors.textSecondary
+                colors.textSecondary
               }
               keyboardType="decimal-pad"
               textAlign="right"
@@ -190,41 +253,78 @@ export default function QuoteTotalsForm({
         </>
       )}
 
-      <Text style={styles.label}>
+      <Text
+        style={[
+          styles.label,
+          {color: colors.textPrimary},
+        ]}>
         מע״מ
       </Text>
 
-      <View style={styles.priceInputContainer}>
-        <Text style={styles.inputSuffix}>
+      <View
+        style={[
+          styles.priceInputContainer,
+          {
+            borderColor: colors.border,
+            backgroundColor: colors.surface,
+          },
+        ]}>
+        <Text
+          style={[
+            styles.inputSuffix,
+            {color: colors.textSecondary},
+          ]}>
           %
         </Text>
 
         <TextInput
-          style={styles.priceInput}
+          style={[
+            styles.priceInput,
+            {color: colors.textPrimary},
+          ]}
           value={vatRate}
           onChangeText={
             onChangeVatRate
           }
           placeholder="18"
           placeholderTextColor={
-            Colors.textSecondary
+            colors.textSecondary
           }
           keyboardType="decimal-pad"
           textAlign="right"
         />
       </View>
 
-      <View style={styles.summaryCard}>
-        <Text style={styles.summaryTitle}>
+      <View
+        style={[
+          styles.summaryCard,
+          {
+            borderColor: colors.border,
+            backgroundColor: colors.surface,
+          },
+        ]}>
+        <Text
+          style={[
+            styles.summaryTitle,
+            {color: colors.textPrimary},
+          ]}>
           סיכום
         </Text>
 
         <View style={styles.summaryRow}>
-          <Text style={styles.summaryLabel}>
+          <Text
+            style={[
+              styles.summaryLabel,
+              {color: colors.textSecondary},
+            ]}>
             סכום ביניים
           </Text>
 
-          <Text style={styles.summaryValue}>
+          <Text
+            style={[
+              styles.summaryValue,
+              {color: colors.textPrimary},
+            ]}>
             ₪{subtotal.toFixed(2)}
           </Text>
         </View>
@@ -232,38 +332,66 @@ export default function QuoteTotalsForm({
         {discountType !== 'none' &&
           discountAmount > 0 && (
             <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>
+              <Text
+                style={[
+                  styles.summaryLabel,
+                  {color: colors.textSecondary},
+                ]}>
                 הנחה
               </Text>
 
-              <Text style={styles.summaryValue}>
-                -₪
-                {discountAmount.toFixed(2)}
+              <Text
+                style={[
+                  styles.summaryValue,
+                  {color: colors.textPrimary},
+                ]}>
+                -₪{discountAmount.toFixed(2)}
               </Text>
             </View>
           )}
 
         <View style={styles.summaryRow}>
-          <Text style={styles.summaryLabel}>
+          <Text
+            style={[
+              styles.summaryLabel,
+              {color: colors.textSecondary},
+            ]}>
             מע״מ
             {vatNumber > 0
               ? ` (${vatNumber}%)`
               : ''}
           </Text>
 
-          <Text style={styles.summaryValue}>
+          <Text
+            style={[
+              styles.summaryValue,
+              {color: colors.textPrimary},
+            ]}>
             ₪{vatAmount.toFixed(2)}
           </Text>
         </View>
 
-        <View style={styles.divider} />
+        <View
+          style={[
+            styles.divider,
+            {backgroundColor: colors.border},
+          ]}
+        />
 
         <View style={styles.totalRow}>
-          <Text style={styles.totalLabel}>
+          <Text
+            style={[
+              styles.totalLabel,
+              {color: colors.textPrimary},
+            ]}>
             סה״כ
           </Text>
 
-          <Text style={styles.totalValue}>
+          <Text
+            style={[
+              styles.totalValue,
+              {color: colors.primary},
+            ]}>
             ₪{total.toFixed(2)}
           </Text>
         </View>
@@ -281,7 +409,6 @@ const styles = StyleSheet.create({
     marginBottom: 14,
     fontSize: 19,
     fontWeight: '700',
-    color: Colors.textPrimary,
     textAlign: 'right',
   },
 
@@ -290,7 +417,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     fontSize: 14,
     fontWeight: '600',
-    color: Colors.textPrimary,
     textAlign: 'right',
   },
 
@@ -304,25 +430,16 @@ const styles = StyleSheet.create({
     minHeight: 48,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: Colors.border,
-    backgroundColor: Colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-
-  optionButtonSelected: {
-    borderColor: Colors.primary,
-    backgroundColor: '#EEF2FF',
   },
 
   optionText: {
     fontSize: 15,
     fontWeight: '600',
-    color: Colors.textSecondary,
   },
 
   optionTextSelected: {
-    color: Colors.primary,
     fontWeight: '700',
   },
 
@@ -331,8 +448,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: Colors.border,
-    backgroundColor: Colors.surface,
     flexDirection: 'row-reverse',
     alignItems: 'center',
   },
@@ -340,14 +455,12 @@ const styles = StyleSheet.create({
   priceInput: {
     flex: 1,
     fontSize: 16,
-    color: Colors.textPrimary,
   },
 
   inputSuffix: {
     marginLeft: 8,
     fontSize: 16,
     fontWeight: '600',
-    color: Colors.textSecondary,
   },
 
   summaryCard: {
@@ -355,15 +468,12 @@ const styles = StyleSheet.create({
     padding: 18,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: Colors.border,
-    backgroundColor: Colors.surface,
   },
 
   summaryTitle: {
     marginBottom: 14,
     fontSize: 17,
     fontWeight: '700',
-    color: Colors.textPrimary,
     textAlign: 'right',
   },
 
@@ -376,19 +486,16 @@ const styles = StyleSheet.create({
 
   summaryLabel: {
     fontSize: 14,
-    color: Colors.textSecondary,
   },
 
   summaryValue: {
     fontSize: 15,
     fontWeight: '600',
-    color: Colors.textPrimary,
   },
 
   divider: {
     height: 1,
     marginVertical: 6,
-    backgroundColor: Colors.border,
   },
 
   totalRow: {
@@ -401,12 +508,10 @@ const styles = StyleSheet.create({
   totalLabel: {
     fontSize: 18,
     fontWeight: '700',
-    color: Colors.textPrimary,
   },
 
   totalValue: {
     fontSize: 22,
     fontWeight: '800',
-    color: Colors.primary,
   },
 });

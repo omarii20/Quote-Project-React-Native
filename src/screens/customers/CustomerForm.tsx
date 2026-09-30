@@ -9,7 +9,7 @@ import {
   View,
 } from 'react-native';
 
-import {Colors} from '../../constants/colors';
+import {useTheme} from '../../context/ThemeContext';
 
 import type {
   CreateCustomerData,
@@ -32,6 +32,8 @@ export default function CustomerForm({
   initialValues,
   submitLabel = 'שמור לקוח',
 }: Props) {
+  const {colors} = useTheme();
+
   const [name, setName] = useState(initialValues?.name ?? '');
   const [phone, setPhone] = useState(initialValues?.phone ?? '');
   const [email, setEmail] = useState(initialValues?.email ?? '');
@@ -56,70 +58,110 @@ export default function CustomerForm({
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>
+      <Text
+        style={[
+          styles.label,
+          {color: colors.textPrimary},
+        ]}>
         שם הלקוח *
       </Text>
 
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          {
+            backgroundColor: colors.background,
+            borderColor: colors.border,
+            color: colors.textPrimary,
+          },
+        ]}
         value={name}
         onChangeText={setName}
         placeholder="שם הלקוח"
-        placeholderTextColor={
-          Colors.textSecondary
-        }
+        placeholderTextColor={colors.textSecondary}
         textAlign="right"
       />
 
-      <Text style={styles.label}>
+      <Text
+        style={[
+          styles.label,
+          {color: colors.textPrimary},
+        ]}>
         טלפון
       </Text>
 
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          {
+            backgroundColor: colors.background,
+            borderColor: colors.border,
+            color: colors.textPrimary,
+          },
+        ]}
         value={phone}
         onChangeText={setPhone}
         placeholder="מספר טלפון"
-        placeholderTextColor={
-          Colors.textSecondary
-        }
+        placeholderTextColor={colors.textSecondary}
         keyboardType="phone-pad"
         textAlign="right"
       />
 
-      <Text style={styles.label}>
+      <Text
+        style={[
+          styles.label,
+          {color: colors.textPrimary},
+        ]}>
         אימייל
       </Text>
 
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          {
+            backgroundColor: colors.background,
+            borderColor: colors.border,
+            color: colors.textPrimary,
+          },
+        ]}
         value={email}
         onChangeText={setEmail}
         placeholder="example@email.com"
-        placeholderTextColor={
-          Colors.textSecondary
-        }
+        placeholderTextColor={colors.textSecondary}
         keyboardType="email-address"
         autoCapitalize="none"
         textAlign="right"
       />
 
-      <Text style={styles.label}>
+      <Text
+        style={[
+          styles.label,
+          {color: colors.textPrimary},
+        ]}>
         כתובת
       </Text>
 
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          {
+            backgroundColor: colors.background,
+            borderColor: colors.border,
+            color: colors.textPrimary,
+          },
+        ]}
         value={address}
         onChangeText={setAddress}
         placeholder="כתובת"
-        placeholderTextColor={
-          Colors.textSecondary
-        }
+        placeholderTextColor={colors.textSecondary}
         textAlign="right"
       />
 
-      <Text style={styles.label}>
+      <Text
+        style={[
+          styles.label,
+          {color: colors.textPrimary},
+        ]}>
         הערות
       </Text>
 
@@ -127,13 +169,16 @@ export default function CustomerForm({
         style={[
           styles.input,
           styles.notesInput,
+          {
+            backgroundColor: colors.background,
+            borderColor: colors.border,
+            color: colors.textPrimary,
+          },
         ]}
         value={notes}
         onChangeText={setNotes}
         placeholder="הערות על הלקוח"
-        placeholderTextColor={
-          Colors.textSecondary
-        }
+        placeholderTextColor={colors.textSecondary}
         multiline
         numberOfLines={4}
         textAlign="right"
@@ -143,6 +188,7 @@ export default function CustomerForm({
       <TouchableOpacity
         style={[
           styles.submitButton,
+          {backgroundColor: colors.primary},
           (!name.trim() || loading) &&
             styles.disabledButton,
         ]}
@@ -173,7 +219,6 @@ const styles = StyleSheet.create({
     marginTop: 14,
     fontSize: 14,
     fontWeight: '600',
-    color: Colors.textPrimary,
     textAlign: 'right',
   },
 
@@ -181,10 +226,7 @@ const styles = StyleSheet.create({
     minHeight: 50,
     paddingHorizontal: 14,
     borderWidth: 1,
-    borderColor: Colors.border,
     borderRadius: 12,
-    backgroundColor: Colors.background,
-    color: Colors.textPrimary,
     fontSize: 15,
   },
 
@@ -198,7 +240,6 @@ const styles = StyleSheet.create({
     minHeight: 52,
     marginTop: 24,
     borderRadius: 14,
-    backgroundColor: Colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -20,7 +20,7 @@ import type {
   NativeStackNavigationProp,
 } from '@react-navigation/native-stack';
 
-import {Colors} from '../../../constants/colors';
+import {useTheme} from '../../../context/ThemeContext';
 
 import {
   type Quote,
@@ -58,10 +58,12 @@ type NavigationProp =
     >
   >;
 
-export default function NeedAttention({quotes,}: Props) {
+export default function NeedAttention({quotes}: Props) {
   const navigation = useNavigation<NavigationProp>();
+  const {colors} = useTheme();
 
-  const attentionQuotes = useMemo(() => { const now = new Date();
+  const attentionQuotes = useMemo(() => {
+    const now = new Date();
 
     const items: AttentionItem[] = [];
 
@@ -211,14 +213,24 @@ export default function NeedAttention({quotes,}: Props) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.sectionTitle}>
+      <Text
+        style={[
+          styles.sectionTitle,
+          {color: colors.textPrimary},
+        ]}>
         דורש טיפול
       </Text>
 
       {attentionQuotes.map(item => (
         <TouchableOpacity
           key={item.quote.id}
-          style={styles.card}
+          style={[
+            styles.card,
+            {
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
+            },
+          ]}
           activeOpacity={0.8}
           onPress={() =>
             navigation.navigate(
@@ -232,9 +244,10 @@ export default function NeedAttention({quotes,}: Props) {
 
           <View style={styles.topRow}>
             <Text
-              style={
-                styles.quoteNumber
-              }>
+              style={[
+                styles.quoteNumber,
+                {color: colors.textSecondary},
+              ]}>
               {
                 item.quote
                   .quote_number
@@ -248,12 +261,20 @@ export default function NeedAttention({quotes,}: Props) {
             />
           </View>
 
-          <Text style={styles.title}>
+          <Text
+            style={[
+              styles.title,
+              {color: colors.textPrimary},
+            ]}>
             {item.quote.title ||
               'הצעת מחיר ללא כותרת'}
           </Text>
 
-          <Text style={styles.message}>
+          <Text
+            style={[
+              styles.message,
+              {color: colors.danger},
+            ]}>
             {item.message}
           </Text>
 
@@ -273,20 +294,14 @@ const styles =
       marginBottom: 12,
       fontSize: 20,
       fontWeight: '700',
-      color:
-        Colors.textPrimary,
       textAlign: 'right',
     },
 
     card: {
       marginBottom: 10,
       padding: 16,
-      backgroundColor:
-        Colors.surface,
       borderRadius: 18,
       borderWidth: 1,
-      borderColor:
-        Colors.border,
     },
 
     topRow: {
@@ -300,16 +315,12 @@ const styles =
     quoteNumber: {
       fontSize: 13,
       fontWeight: '600',
-      color:
-        Colors.textSecondary,
     },
 
     title: {
       marginTop: 12,
       fontSize: 16,
       fontWeight: '700',
-      color:
-        Colors.textPrimary,
       textAlign: 'right',
     },
 
@@ -317,7 +328,6 @@ const styles =
       marginTop: 6,
       fontSize: 14,
       lineHeight: 20,
-      color: Colors.danger,
       textAlign: 'right',
     },
   });

@@ -6,10 +6,10 @@ import {
   Text,
   View,
 } from 'react-native';
-import { SafeAreaView} from 'react-native-safe-area-context';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
-import {Colors} from '../../constants/colors';
 import {useQuotes} from '../../context/QuotesContext';
+import {useTheme} from '../../context/ThemeContext';
 
 import HomeHeader from './components/HomeHeader';
 import QuickActions from './components/QuickActions';
@@ -17,6 +17,7 @@ import RecentQuotes from './components/RecentQuotes';
 import NeedAttention from './components/NeedAttention';
 
 export default function HomeScreen() {
+  const {colors} = useTheme();
   const {
     quotes,
     loading,
@@ -28,7 +29,11 @@ export default function HomeScreen() {
   }, [quotes]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={[
+        styles.container,
+        {backgroundColor: colors.background},
+      ]}>
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}>
@@ -41,22 +46,38 @@ export default function HomeScreen() {
           <View style={styles.loadingContainer}>
             <ActivityIndicator
               size="large"
-              color={Colors.primary}
+              color={colors.primary}
             />
 
-            <Text style={styles.loadingText}>
+            <Text
+              style={[
+                styles.loadingText,
+                {color: colors.textSecondary},
+              ]}>
               טוען נתונים...
             </Text>
           </View>
         ) : error ? (
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>
+          <View
+            style={[
+              styles.errorContainer,
+              {
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
+              },
+            ]}>
+            <Text
+              style={[
+                styles.errorText,
+                {color: colors.danger},
+              ]}>
               {error}
             </Text>
           </View>
         ) : (
           <>
             <NeedAttention quotes={quotes} />
+
             <RecentQuotes
               quotes={recentQuotes}
             />
@@ -70,7 +91,6 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
   },
 
   content: {
@@ -88,19 +108,15 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 14,
-    color: Colors.textSecondary,
   },
 
   errorContainer: {
-    backgroundColor: Colors.surface,
     borderRadius: 18,
     padding: 20,
     borderWidth: 1,
-    borderColor: Colors.border,
   },
 
   errorText: {
-    color: Colors.danger,
     fontSize: 14,
     textAlign: 'right',
   },

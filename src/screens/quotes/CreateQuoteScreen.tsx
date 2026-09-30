@@ -11,9 +11,11 @@ import {
   Text,
   View,
 } from 'react-native';
-import { SafeAreaView} from 'react-native-safe-area-context';
 
-import { useNavigation,
+import {SafeAreaView} from 'react-native-safe-area-context';
+
+import {
+  useNavigation,
 } from '@react-navigation/native';
 
 import type {
@@ -24,8 +26,9 @@ import type {
   MainStackParamList,
 } from '../../navigation/MainNavigator';
 
-import {Colors} from '../../constants/colors';
 import {useQuotes} from '../../context/QuotesContext';
+import {useTheme} from '../../context/ThemeContext';
+
 import BackButton from '../../components/ui/BackButton';
 import CustomerSelector from '../customers/CustomerSelector';
 
@@ -56,17 +59,23 @@ import {
   type CreateQuoteData,
 } from '../../api/quotesApi';
 
-type CreateQuoteNavigationProp =NativeStackNavigationProp<MainStackParamList,'CreateQuote'>;
+type CreateQuoteNavigationProp =
+  NativeStackNavigationProp<
+    MainStackParamList,
+    'CreateQuote'
+  >;
 
 export default function CreateQuoteScreen() {
   const {addQuote} = useQuotes();
+  const {colors} = useTheme();
+
   const [savingQuote, setSavingQuote] = useState(false);
   const [submitError, setSubmitError] = useState('');
+
   const navigation = useNavigation<CreateQuoteNavigationProp>();
 
   // Customers
-  const [customers, setCustomers] =
-    useState<Customer[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
 
   const [
     selectedCustomer,
@@ -89,8 +98,7 @@ export default function CreateQuoteScreen() {
   ] = useState('');
 
   // Quote details
-  const [title, setTitle] =
-    useState('');
+  const [title, setTitle] = useState('');
 
   const [
     description,
@@ -153,7 +161,9 @@ export default function CreateQuoteScreen() {
     setNotes,
   ] = useState('');
 
-  const handleAddCustomer = async (data: CreateCustomerData,): Promise<Customer> => {
+  const handleAddCustomer = async (
+    data: CreateCustomerData,
+  ): Promise<Customer> => {
     try {
       setCreatingCustomer(true);
 
@@ -172,15 +182,16 @@ export default function CreateQuoteScreen() {
   };
 
   const handleCreateQuote = async () => {
-    const validation = validateQuote({customerId:
+    const validation = validateQuote({
+      customerId:
         selectedCustomer?.id ?? null,
-        pricingMethod,
-        items,
-        additionalAmount,
-        manualSubtotal,
-        discountType,
-        discountValue,
-        vatRate,
+      pricingMethod,
+      items,
+      additionalAmount,
+      manualSubtotal,
+      discountType,
+      discountValue,
+      vatRate,
     });
 
     if (!validation.isValid) {
@@ -196,47 +207,72 @@ export default function CreateQuoteScreen() {
       setSavingQuote(true);
       setSubmitError('');
 
-      const formattedValidUntil = validUntil? (() => {
-              const date = new Date(validUntil);
-              date.setHours(12, 0, 0, 0);
-              return date.toISOString();
-            })(): null;
+      const formattedValidUntil = validUntil
+        ? (() => {
+            const date = new Date(validUntil);
+            date.setHours(12, 0, 0, 0);
+
+            return date.toISOString();
+          })()
+        : null;
 
       const payload: CreateQuoteData = {
         customer_id: selectedCustomer.id,
-        title:title.trim() || undefined,
-        description: description.trim() || undefined,
+        title: title.trim() || undefined,
+        description:
+          description.trim() || undefined,
         pricing_method: pricingMethod,
-        discount_type: discountType === 'none' ? null: discountType,
-        discount_value: discountType === 'none' ? 0 : Number(discountValue),
+        discount_type:
+          discountType === 'none'
+            ? null
+            : discountType,
+        discount_value:
+          discountType === 'none'
+            ? 0
+            : Number(discountValue),
         vat_rate: Number(vatRate),
         status: 'draft',
         valid_until: formattedValidUntil,
         notes: notes.trim() || undefined,
-        ...(pricingMethod === 'items' ? {additional_amount: Number( additionalAmount, ) || 0,
+
+        ...(pricingMethod === 'items'
+          ? {
+              additional_amount:
+                Number(additionalAmount) || 0,
 
               items: items.map(
                 (item, index) => ({
-                  description: item.description.trim(),
-                  quantity: Number( item.quantity),
-                  unit_price:Number(item.unitPrice),
-                  total_overridden:false,
+                  description:
+                    item.description.trim(),
+                  quantity:
+                    Number(item.quantity),
+                  unit_price:
+                    Number(item.unitPrice),
+                  total_overridden: false,
                   position: index + 1,
                 }),
               ),
-            }:{
-              manual_subtotal: Number(manualSubtotal),
+            }
+          : {
+              manual_subtotal:
+                Number(manualSubtotal),
             }),
       };
 
-      //console.log('Create quote payload:',payload,);
       const newQuote = await createQuote(payload);
+
       addQuote(newQuote);
+
       navigation.goBack();
-      //console.log('Created quote:',newQuote);
     } catch (error) {
-      console.log('Create quote error:', error,);
-      setSubmitError('לא הצלחנו ליצור את הצעת המחיר.');
+      console.log(
+        'Create quote error:',
+        error,
+      );
+
+      setSubmitError(
+        'לא הצלחנו ליצור את הצעת המחיר.',
+      );
     } finally {
       setSavingQuote(false);
     }
@@ -295,11 +331,19 @@ export default function CreateQuoteScreen() {
       : Number(manualSubtotal) || 0;
 
   return (
-    <SafeAreaView style={styles.container}> 
+    <SafeAreaView
+      style={[
+        styles.container,
+        {backgroundColor: colors.background},
+      ]}>
       <View style={styles.header}>
         <BackButton />
 
-        <Text style={styles.title}>
+        <Text
+          style={[
+            styles.title,
+            {color: colors.textPrimary},
+          ]}>
           יצירת הצעת מחיר חדשה
         </Text>
       </View>
@@ -308,15 +352,23 @@ export default function CreateQuoteScreen() {
         <View style={styles.loadingContainer}>
           <ActivityIndicator
             size="small"
-            color={Colors.primary}
+            color={colors.primary}
           />
 
-          <Text style={styles.loadingText}>
+          <Text
+            style={[
+              styles.loadingText,
+              {color: colors.textSecondary},
+            ]}>
             טוען לקוחות...
           </Text>
         </View>
       ) : customersError ? (
-        <Text style={styles.errorText}>
+        <Text
+          style={[
+            styles.errorText,
+            {color: colors.danger},
+          ]}>
           {customersError}
         </Text>
       ) : (
@@ -409,21 +461,29 @@ export default function CreateQuoteScreen() {
             validUntil={validUntil}
             notes={notes}
             onChangeValidUntil={
-                setValidUntil
+              setValidUntil
             }
             onChangeNotes={
-                setNotes
+              setNotes
             }
           />
-            {submitError ? (
-              <Text style={styles.submitError}>{submitError} </Text>
-            ) : null}
+
+          {submitError ? (
+            <Text
+              style={[
+                styles.submitError,
+                {color: colors.danger},
+              ]}>
+              {submitError}
+            </Text>
+          ) : null}
 
           <TouchableOpacity
             style={[
               styles.saveButton,
+              {backgroundColor: colors.primary},
               savingQuote &&
-              styles.saveButtonDisabled,
+                styles.saveButtonDisabled,
             ]}
             onPress={handleCreateQuote}
             disabled={savingQuote}
@@ -450,7 +510,6 @@ export default function CreateQuoteScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
     paddingHorizontal: 20,
     paddingTop: 10,
   },
@@ -465,7 +524,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 24,
     fontWeight: '700',
-    color: Colors.textPrimary,
     textAlign: 'right',
   },
 
@@ -486,38 +544,35 @@ const styles = StyleSheet.create({
 
   loadingText: {
     fontSize: 14,
-    color: Colors.textSecondary,
   },
 
   errorText: {
     marginTop: 28,
     fontSize: 14,
-    color: Colors.danger,
     textAlign: 'right',
   },
+
   submitError: {
-  marginTop: 16,
-  fontSize: 14,
-  color: Colors.danger,
-  textAlign: 'right',
-},
+    marginTop: 16,
+    fontSize: 14,
+    textAlign: 'right',
+  },
 
-saveButton: {
-  height: 54,
-  marginTop: 20,
-  borderRadius: 14,
-  backgroundColor: Colors.primary,
-  alignItems: 'center',
-  justifyContent: 'center',
-},
+  saveButton: {
+    height: 54,
+    marginTop: 20,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 
-saveButtonDisabled: {
-  opacity: 0.6,
-},
+  saveButtonDisabled: {
+    opacity: 0.6,
+  },
 
-saveButtonText: {
-  fontSize: 17,
-  fontWeight: '700',
-  color: '#FFFFFF',
-},
+  saveButtonText: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
 });

@@ -25,24 +25,28 @@ import {
 } from '../../api/customersApi';
 
 import {useCustomers} from '../../context/CustomersContext';
+import {useTheme} from '../../context/ThemeContext';
 
 import CustomerForm from './CustomerForm';
 
 import BackButton from '../../components/ui/BackButton';
 
-import {Colors} from '../../constants/colors';
-
 import type {MainStackParamList} from '../../navigation/MainNavigator';
 
 type NavigationProp = NativeStackNavigationProp<MainStackParamList>;
 
-type RouteProp = NativeStackScreenProps<MainStackParamList,'EditCustomer'>['route'];
+type RouteProp =
+  NativeStackScreenProps<
+    MainStackParamList,
+    'EditCustomer'
+  >['route'];
 
 export default function EditCustomerScreen() {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<RouteProp>();
 
   const {customers, updateCustomer: updateCustomerContext} = useCustomers();
+  const {colors} = useTheme();
 
   const {customerId} = route.params;
 
@@ -81,9 +85,17 @@ export default function EditCustomerScreen() {
 
   if (!customer) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView
+        style={[
+          styles.container,
+          {backgroundColor: colors.background},
+        ]}>
         <View style={styles.centerContainer}>
-          <Text style={styles.errorText}>
+          <Text
+            style={[
+              styles.errorText,
+              {color: colors.danger},
+            ]}>
             הלקוח לא נמצא.
           </Text>
         </View>
@@ -92,7 +104,11 @@ export default function EditCustomerScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={[
+        styles.container,
+        {backgroundColor: colors.background},
+      ]}>
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
@@ -101,20 +117,39 @@ export default function EditCustomerScreen() {
         <View style={styles.header}>
           <BackButton />
 
-          <Text style={styles.title}>
+          <Text
+            style={[
+              styles.title,
+              {color: colors.textPrimary},
+            ]}>
             עריכת לקוח
           </Text>
 
           <View style={styles.headerPlaceholder} />
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.subtitle}>
+        <View
+          style={[
+            styles.card,
+            {
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
+            },
+          ]}>
+          <Text
+            style={[
+              styles.subtitle,
+              {color: colors.textPrimary},
+            ]}>
             פרטי הלקוח
           </Text>
 
           {error ? (
-            <Text style={styles.errorText}>
+            <Text
+              style={[
+                styles.errorText,
+                {color: colors.danger},
+              ]}>
               {error}
             </Text>
           ) : null}
@@ -126,6 +161,7 @@ export default function EditCustomerScreen() {
             submitLabel="שמור שינויים"
           />
         </View>
+
       </ScrollView>
     </SafeAreaView>
   );
@@ -134,7 +170,6 @@ export default function EditCustomerScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
   },
 
   content: {
@@ -153,7 +188,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '700',
-    color: Colors.textPrimary,
   },
 
   headerPlaceholder: {
@@ -164,15 +198,12 @@ const styles = StyleSheet.create({
     padding: 18,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: Colors.border,
-    backgroundColor: Colors.surface,
   },
 
   subtitle: {
     marginBottom: 4,
     fontSize: 17,
     fontWeight: '700',
-    color: Colors.textPrimary,
     textAlign: 'right',
   },
 
@@ -185,7 +216,6 @@ const styles = StyleSheet.create({
 
   errorText: {
     marginTop: 12,
-    color: Colors.danger,
     fontSize: 14,
     textAlign: 'right',
   },

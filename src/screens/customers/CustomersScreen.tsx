@@ -15,9 +15,8 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation} from '@react-navigation/native';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
-import {Colors} from '../../constants/colors';
-
 import {useCustomers} from '../../context/CustomersContext';
+import {useTheme} from '../../context/ThemeContext';
 
 import type {MainStackParamList} from '../../navigation/MainNavigator';
 
@@ -25,6 +24,7 @@ type CustomersNavigationProp = NativeStackNavigationProp<MainStackParamList>;
 
 export default function CustomersScreen() {
   const navigation = useNavigation<CustomersNavigationProp>();
+  const {colors} = useTheme();
 
   const {
     customers,
@@ -71,25 +71,40 @@ export default function CustomersScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={[
+        styles.container,
+        {backgroundColor: colors.background},
+      ]}>
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled">
 
         <View style={styles.header}>
-          <Text style={styles.title}>
+          <Text
+            style={[
+              styles.title,
+              {color: colors.textPrimary},
+            ]}>
             לקוחות
           </Text>
 
-          <Text style={styles.subtitle}>
+          <Text
+            style={[
+              styles.subtitle,
+              {color: colors.textSecondary},
+            ]}>
             ניהול הלקוחות של העסק
           </Text>
         </View>
 
         <View style={styles.actionsRow}>
           <TouchableOpacity
-            style={styles.addButton}
+            style={[
+              styles.addButton,
+              {backgroundColor: colors.primary},
+            ]}
             activeOpacity={0.8}
             onPress={() =>
               navigation.navigate('CreateCustomer')
@@ -100,23 +115,41 @@ export default function CustomersScreen() {
           </TouchableOpacity>
 
           <View style={styles.customerCount}>
-            <Text style={styles.customerCountValue}>
+            <Text
+              style={[
+                styles.customerCountValue,
+                {color: colors.primary},
+              ]}>
               {customers.length}
             </Text>
 
-            <Text style={styles.customerCountLabel}>
+            <Text
+              style={[
+                styles.customerCountLabel,
+                {color: colors.textSecondary},
+              ]}>
               לקוחות
             </Text>
           </View>
         </View>
 
-        <View style={styles.searchContainer}>
+        <View
+          style={[
+            styles.searchContainer,
+            {
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
+            },
+          ]}>
           <TextInput
             value={search}
             onChangeText={setSearch}
             placeholder="חיפוש לפי שם, טלפון או אימייל"
-            placeholderTextColor={Colors.textSecondary}
-            style={styles.searchInput}
+            placeholderTextColor={colors.textSecondary}
+            style={[
+              styles.searchInput,
+              {color: colors.textPrimary},
+            ]}
             textAlign="right"
           />
         </View>
@@ -125,26 +158,56 @@ export default function CustomersScreen() {
           <View style={styles.centerContainer}>
             <ActivityIndicator
               size="large"
-              color={Colors.primary}
+              color={colors.primary}
             />
 
-            <Text style={styles.loadingText}>
+            <Text
+              style={[
+                styles.loadingText,
+                {color: colors.textSecondary},
+              ]}>
               טוען לקוחות...
             </Text>
           </View>
         ) : error ? (
-          <View style={styles.messageCard}>
-            <Text style={styles.errorText}>
+          <View
+            style={[
+              styles.messageCard,
+              {
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
+              },
+            ]}>
+            <Text
+              style={[
+                styles.errorText,
+                {color: colors.danger},
+              ]}>
               {error}
             </Text>
           </View>
         ) : filteredCustomers.length === 0 ? (
-          <View style={styles.messageCard}>
-            <Text style={styles.emptyTitle}>
+          <View
+            style={[
+              styles.messageCard,
+              {
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
+              },
+            ]}>
+            <Text
+              style={[
+                styles.emptyTitle,
+                {color: colors.textPrimary},
+              ]}>
               לא נמצאו לקוחות
             </Text>
 
-            <Text style={styles.emptyText}>
+            <Text
+              style={[
+                styles.emptyText,
+                {color: colors.textSecondary},
+              ]}>
               {search
                 ? 'לא נמצאו לקוחות התואמים לחיפוש.'
                 : 'הלקוחות שתוסיף לעסק יופיעו כאן.'}
@@ -155,7 +218,13 @@ export default function CustomersScreen() {
             {filteredCustomers.map(customer => (
               <TouchableOpacity
                 key={customer.id}
-                style={styles.customerCard}
+                style={[
+                  styles.customerCard,
+                  {
+                    backgroundColor: colors.surface,
+                    borderColor: colors.border,
+                  },
+                ]}
                 activeOpacity={0.8}
                 onPress={() =>
                   navigation.navigate('CustomerDetails', {
@@ -164,25 +233,45 @@ export default function CustomersScreen() {
                 }>
 
                 <View style={styles.customerHeader}>
-                  <View style={styles.avatar}>
-                    <Text style={styles.avatarText}>
+                  <View
+                    style={[
+                      styles.avatar,
+                      {backgroundColor: colors.surfaceSecondary},
+                    ]}>
+                    <Text
+                      style={[
+                        styles.avatarText,
+                        {color: colors.primary},
+                      ]}>
                       {getInitials(customer.name)}
                     </Text>
                   </View>
 
                   <View style={styles.customerInfo}>
-                    <Text style={styles.customerName}>
+                    <Text
+                      style={[
+                        styles.customerName,
+                        {color: colors.textPrimary},
+                      ]}>
                       {customer.name}
                     </Text>
 
                     {customer.phone ? (
-                      <Text style={styles.customerDetail}>
+                      <Text
+                        style={[
+                          styles.customerDetail,
+                          {color: colors.textSecondary},
+                        ]}>
                         {customer.phone}
                       </Text>
                     ) : null}
 
                     {customer.email ? (
-                      <Text style={styles.customerDetail}>
+                      <Text
+                        style={[
+                          styles.customerDetail,
+                          {color: colors.textSecondary},
+                        ]}>
                         {customer.email}
                       </Text>
                     ) : null}
@@ -190,8 +279,16 @@ export default function CustomersScreen() {
                 </View>
 
                 {customer.address ? (
-                  <View style={styles.cardFooter}>
-                    <Text style={styles.address}>
+                  <View
+                    style={[
+                      styles.cardFooter,
+                      {borderTopColor: colors.border},
+                    ]}>
+                    <Text
+                      style={[
+                        styles.address,
+                        {color: colors.textSecondary},
+                      ]}>
                       {customer.address}
                     </Text>
                   </View>
@@ -200,6 +297,7 @@ export default function CustomersScreen() {
             ))}
           </View>
         )}
+
       </ScrollView>
     </SafeAreaView>
   );
@@ -208,7 +306,6 @@ export default function CustomersScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
   },
 
   content: {
@@ -225,14 +322,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: '700',
-    color: Colors.textPrimary,
     textAlign: 'right',
   },
 
   subtitle: {
     marginTop: 6,
     fontSize: 15,
-    color: Colors.textSecondary,
     textAlign: 'right',
   },
 
@@ -244,7 +339,6 @@ const styles = StyleSheet.create({
   },
 
   addButton: {
-    backgroundColor: Colors.primary,
     paddingHorizontal: 18,
     paddingVertical: 12,
     borderRadius: 12,
@@ -263,21 +357,17 @@ const styles = StyleSheet.create({
   },
 
   customerCountValue: {
-    color: Colors.primary,
     fontSize: 17,
     fontWeight: '700',
   },
 
   customerCountLabel: {
-    color: Colors.textSecondary,
     fontSize: 14,
   },
 
   searchContainer: {
-    backgroundColor: Colors.surface,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: Colors.border,
     marginBottom: 20,
   },
 
@@ -285,7 +375,6 @@ const styles = StyleSheet.create({
     minHeight: 50,
     paddingHorizontal: 16,
     fontSize: 15,
-    color: Colors.textPrimary,
   },
 
   centerContainer: {
@@ -296,22 +385,18 @@ const styles = StyleSheet.create({
 
   loadingText: {
     marginTop: 12,
-    color: Colors.textSecondary,
     fontSize: 14,
   },
 
   messageCard: {
-    backgroundColor: Colors.surface,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: Colors.border,
     paddingVertical: 35,
     paddingHorizontal: 20,
     alignItems: 'center',
   },
 
   errorText: {
-    color: Colors.danger,
     fontSize: 14,
     textAlign: 'center',
   },
@@ -319,13 +404,11 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 17,
     fontWeight: '700',
-    color: Colors.textPrimary,
   },
 
   emptyText: {
     marginTop: 8,
     fontSize: 14,
-    color: Colors.textSecondary,
     textAlign: 'center',
   },
 
@@ -334,11 +417,9 @@ const styles = StyleSheet.create({
   },
 
   customerCard: {
-    backgroundColor: Colors.surface,
     borderRadius: 18,
     padding: 16,
     borderWidth: 1,
-    borderColor: Colors.border,
   },
 
   customerHeader: {
@@ -350,14 +431,12 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: '#EEF2FF',
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 14,
   },
 
   avatarText: {
-    color: Colors.primary,
     fontSize: 17,
     fontWeight: '700',
   },
@@ -370,14 +449,12 @@ const styles = StyleSheet.create({
   customerName: {
     fontSize: 17,
     fontWeight: '700',
-    color: Colors.textPrimary,
     textAlign: 'right',
   },
 
   customerDetail: {
     marginTop: 4,
     fontSize: 13,
-    color: Colors.textSecondary,
     textAlign: 'right',
   },
 
@@ -385,13 +462,11 @@ const styles = StyleSheet.create({
     marginTop: 14,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: Colors.border,
     alignItems: 'flex-end',
   },
 
   address: {
     fontSize: 13,
-    color: Colors.textSecondary,
     textAlign: 'right',
   },
 });

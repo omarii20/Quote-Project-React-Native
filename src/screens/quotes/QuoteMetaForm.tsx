@@ -15,7 +15,7 @@ import DateTimePicker, {
   DateTimePickerEvent,
 } from '@react-native-community/datetimepicker';
 
-import {Colors} from '../../constants/colors';
+import {useTheme} from '../../context/ThemeContext';
 
 type Props = {
   validUntil: Date | null;
@@ -36,6 +36,8 @@ export default function QuoteMetaForm({
   onChangeValidUntil,
   onChangeNotes,
 }: Props) {
+  const {colors} = useTheme();
+
   const [
     showDatePicker,
     setShowDatePicker,
@@ -69,16 +71,30 @@ export default function QuoteMetaForm({
 
   return (
     <View style={styles.container}>
-      <Text style={styles.sectionTitle}>
+      <Text
+        style={[
+          styles.sectionTitle,
+          {color: colors.textPrimary},
+        ]}>
         פרטים נוספים
       </Text>
 
-      <Text style={styles.label}>
+      <Text
+        style={[
+          styles.label,
+          {color: colors.textPrimary},
+        ]}>
         תוקף ההצעה
       </Text>
 
       <TouchableOpacity
-        style={styles.dateButton}
+        style={[
+          styles.dateButton,
+          {
+            borderColor: colors.border,
+            backgroundColor: colors.surface,
+          },
+        ]}
         activeOpacity={0.8}
         onPress={() =>
           setShowDatePicker(true)
@@ -86,8 +102,11 @@ export default function QuoteMetaForm({
         <Text
           style={[
             styles.dateText,
-            !validUntil &&
-              styles.placeholderText,
+            {
+              color: validUntil
+                ? colors.textPrimary
+                : colors.textSecondary,
+            },
           ]}>
           {validUntil
             ? formatDate(validUntil)
@@ -110,7 +129,11 @@ export default function QuoteMetaForm({
         />
       )}
 
-      <Text style={styles.label}>
+      <Text
+        style={[
+          styles.label,
+          {color: colors.textPrimary},
+        ]}>
         הערות
       </Text>
 
@@ -118,6 +141,11 @@ export default function QuoteMetaForm({
         style={[
           styles.input,
           styles.notesInput,
+          {
+            borderColor: colors.border,
+            backgroundColor: colors.surface,
+            color: colors.textPrimary,
+          },
         ]}
         value={notes}
         onChangeText={
@@ -125,7 +153,7 @@ export default function QuoteMetaForm({
         }
         placeholder="הערות להצעת המחיר"
         placeholderTextColor={
-          Colors.textSecondary
+          colors.textSecondary
         }
         multiline
         textAlign="right"
@@ -144,7 +172,6 @@ const styles = StyleSheet.create({
     marginBottom: 14,
     fontSize: 19,
     fontWeight: '700',
-    color: Colors.textPrimary,
     textAlign: 'right',
   },
 
@@ -153,7 +180,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     fontSize: 14,
     fontWeight: '600',
-    color: Colors.textPrimary,
     textAlign: 'right',
   },
 
@@ -162,8 +188,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: Colors.border,
-    backgroundColor: Colors.surface,
     flexDirection: 'row-reverse',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -171,11 +195,6 @@ const styles = StyleSheet.create({
 
   dateText: {
     fontSize: 15,
-    color: Colors.textPrimary,
-  },
-
-  placeholderText: {
-    color: Colors.textSecondary,
   },
 
   calendarIcon: {
@@ -187,9 +206,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: Colors.border,
-    backgroundColor: Colors.surface,
-    color: Colors.textPrimary,
     fontSize: 15,
   },
 

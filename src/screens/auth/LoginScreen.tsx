@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -9,20 +10,27 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SafeAreaView} from 'react-native-safe-area-context';
+
+import {SafeAreaView} from 'react-native-safe-area-context';
 
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import type {AuthStackParamList} from '../../navigation/AuthNavigator';
+
 import AppLogo from '../../components/AppLogo';
-import {Colors} from '../../constants/colors';
+
 import {useAuth} from '../../context/AuthContext';
+import {useTheme} from '../../context/ThemeContext';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'Login'>;
 
-export default function LoginScreen({navigation}: Props) {  const [phone, setPhone] = useState('');
+export default function LoginScreen({navigation}: Props) {
+  const {colors} = useTheme();
+
+  const [phone, setPhone] = useState('');
   const {sendOTP} = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
   const isValidPhone = /^05\d{8}$/.test(phone);
 
   const handleSendOTP = async () => {
@@ -49,7 +57,11 @@ export default function LoginScreen({navigation}: Props) {  const [phone, setPho
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView
+      style={[
+        styles.safeArea,
+        {backgroundColor: colors.background},
+      ]}>
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -57,12 +69,35 @@ export default function LoginScreen({navigation}: Props) {  const [phone, setPho
           <AppLogo />
 
           <View style={styles.header}>
-            <Text style={styles.title}>ברוכים הבאים!</Text>
-            <Text style={styles.subtitle}>התחברו כדי להמשיך</Text>
+            <Text
+              style={[
+                styles.title,
+                {color: colors.textPrimary},
+              ]}>
+              ברוכים הבאים!
+            </Text>
+
+            <Text
+              style={[
+                styles.subtitle,
+                {color: colors.textSecondary},
+              ]}>
+              התחברו כדי להמשיך
+            </Text>
           </View>
 
-          <View style={styles.card}>
-            <Text style={styles.label}>מספר טלפון</Text>
+          <View
+            style={[
+              styles.card,
+              {backgroundColor: colors.surface},
+            ]}>
+            <Text
+              style={[
+                styles.label,
+                {color: colors.textPrimary},
+              ]}>
+              מספר טלפון
+            </Text>
 
             <TextInput
               value={phone}
@@ -71,17 +106,26 @@ export default function LoginScreen({navigation}: Props) {  const [phone, setPho
                 setPhone(numbersOnly);
               }}
               placeholder="05X-XXXXXXX"
-              placeholderTextColor="#A3A7B3"
+              placeholderTextColor={colors.textSecondary}
               keyboardType="phone-pad"
               maxLength={10}
-              style={styles.input}
+              style={[
+                styles.input,
+                {
+                  borderColor: colors.border,
+                  color: colors.textPrimary,
+                  backgroundColor: colors.background,
+                },
+              ]}
               textAlign="left"
             />
 
             <TouchableOpacity
               style={[
                 styles.button,
-                (!isValidPhone || isLoading) && styles.buttonDisabled,
+                {backgroundColor: colors.primary},
+                (!isValidPhone || isLoading) &&
+                  styles.buttonDisabled,
               ]}
               disabled={!isValidPhone || isLoading}
               activeOpacity={0.85}
@@ -89,7 +133,7 @@ export default function LoginScreen({navigation}: Props) {  const [phone, setPho
               {isLoading ? (
                 <ActivityIndicator
                   size="small"
-                  color={Colors.surface}
+                  color="#FFFFFF"
                 />
               ) : (
                 <Text style={styles.buttonText}>
@@ -97,14 +141,23 @@ export default function LoginScreen({navigation}: Props) {  const [phone, setPho
                 </Text>
               )}
             </TouchableOpacity>
+
             {!!error && (
-              <Text style={styles.errorText}>
+              <Text
+                style={[
+                  styles.errorText,
+                  {color: colors.danger},
+                ]}>
                 {error}
               </Text>
             )}
           </View>
 
-          <Text style={styles.helperText}>
+          <Text
+            style={[
+              styles.helperText,
+              {color: colors.textSecondary},
+            ]}>
             בהמשך תקבלו קוד אימות (OTP)
           </Text>
         </View>
@@ -116,7 +169,6 @@ export default function LoginScreen({navigation}: Props) {  const [phone, setPho
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Colors.background,
   },
 
   container: {
@@ -138,14 +190,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 31,
     fontWeight: '800',
-    color: Colors.textPrimary,
     textAlign: 'center',
   },
 
   subtitle: {
     marginTop: 8,
     fontSize: 17,
-    color: Colors.textSecondary,
     textAlign: 'center',
   },
 
@@ -154,7 +204,6 @@ const styles = StyleSheet.create({
     marginTop: 34,
     padding: 18,
     borderRadius: 22,
-    backgroundColor: Colors.surface,
 
     shadowColor: '#000',
     shadowOpacity: 0.06,
@@ -171,26 +220,21 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     fontSize: 14,
     fontWeight: '700',
-    color: Colors.textPrimary,
     textAlign: 'right',
   },
 
   input: {
     height: 56,
     borderWidth: 1,
-    borderColor: Colors.border,
     borderRadius: 12,
     paddingHorizontal: 14,
     fontSize: 16,
-    color: Colors.textPrimary,
-    backgroundColor: '#FFFFFF',
   },
 
   button: {
     height: 56,
     marginTop: 16,
     borderRadius: 12,
-    backgroundColor: Colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -208,14 +252,13 @@ const styles = StyleSheet.create({
   helperText: {
     marginTop: 22,
     fontSize: 14,
-    color: Colors.textSecondary,
     textAlign: 'center',
   },
+
   errorText: {
     marginTop: 10,
     fontSize: 14,
     fontWeight: '600',
-    color: Colors.danger,
     textAlign: 'right',
   },
 });

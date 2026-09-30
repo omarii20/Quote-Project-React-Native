@@ -1,27 +1,34 @@
 import React, {useState} from 'react';
 import {
-ActivityIndicator,
-  Alert,  
+  ActivityIndicator,
+  Alert,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
+
 import {SafeAreaView} from 'react-native-safe-area-context';
+
 import {
   useNavigation,
   useRoute,
   type RouteProp,
 } from '@react-navigation/native';
+
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import type {MainStackParamList} from '../../navigation/MainNavigator';
-import {useCustomers} from '../../context/CustomersContext';
+
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons';
+
+import type {MainStackParamList} from '../../navigation/MainNavigator';
+
+import {useCustomers} from '../../context/CustomersContext';
+import {useTheme} from '../../context/ThemeContext';
+
 import {deleteCustomer} from '../../api/customersApi';
 import {ApiError} from '../../api/apiClient';
 
-import {Colors} from '../../constants/colors';
 import BackButton from '../../components/ui/BackButton';
 
 type CustomerDetailsRouteProp =
@@ -33,7 +40,10 @@ type CustomerDetailsNavigationProp =
 export default function CustomerDetailsScreen() {
   const route = useRoute<CustomerDetailsRouteProp>();
   const navigation = useNavigation<CustomerDetailsNavigationProp>();
+  const {colors} = useTheme();
+
   const [deleting, setDeleting] = useState(false);
+
   const {customerId} = route.params;
 
   const {
@@ -49,59 +59,67 @@ export default function CustomerDetailsScreen() {
 
   const handleDeleteCustomer = () => {
     if (!customer || deleting) {
-        return;
+      return;
     }
 
     Alert.alert(
-        'מחיקת לקוח',
-        `האם אתה בטוח שברצונך למחוק את ${customer.name}?`,
-        [
+      'מחיקת לקוח',
+      `האם אתה בטוח שברצונך למחוק את ${customer.name}?`,
+      [
         {
-            text: 'ביטול',
-            style: 'cancel',
+          text: 'ביטול',
+          style: 'cancel',
         },
         {
-            text: 'מחיקה',
-            style: 'destructive',
-            onPress: async () => {
+          text: 'מחיקה',
+          style: 'destructive',
+          onPress: async () => {
             try {
-                setDeleting(true);
+              setDeleting(true);
 
-                await deleteCustomer(customer.id);
+              await deleteCustomer(customer.id);
 
-                removeCustomer(customer.id);
+              removeCustomer(customer.id);
 
-                navigation.goBack();
+              navigation.goBack();
             } catch (err) {
-                console.log('Delete customer error:', err);
+              console.log('Delete customer error:', err);
 
-                if (err instanceof ApiError && err.status === 409) {
-                    Alert.alert(
-                    'לא ניתן למחוק את הלקוח',
-                    'קיימות הצעות מחיר המשויכות ללקוח הזה.',
-                    );
-
-                    return;
-                }
-
+              if (err instanceof ApiError && err.status === 409) {
                 Alert.alert(
-                    'שגיאה',
-                    'לא הצלחנו למחוק את הלקוח.',
+                  'לא ניתן למחוק את הלקוח',
+                  'קיימות הצעות מחיר המשויכות ללקוח הזה.',
                 );
-                } finally {
-                setDeleting(false);
+
+                return;
+              }
+
+              Alert.alert(
+                'שגיאה',
+                'לא הצלחנו למחוק את הלקוח.',
+              );
+            } finally {
+              setDeleting(false);
             }
-            },
+          },
         },
-        ],
+      ],
     );
-    };
+  };
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView
+        style={[
+          styles.container,
+          {backgroundColor: colors.background},
+        ]}>
         <View style={styles.centerContainer}>
-          <Text style={styles.loadingText}>
+          <Text
+            style={[
+              styles.loadingText,
+              {color: colors.textSecondary},
+            ]}>
             טוען פרטי לקוח...
           </Text>
         </View>
@@ -111,11 +129,19 @@ export default function CustomerDetailsScreen() {
 
   if (error || !customer) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView
+        style={[
+          styles.container,
+          {backgroundColor: colors.background},
+        ]}>
         <View style={styles.errorContainer}>
           <BackButton />
 
-          <Text style={styles.errorText}>
+          <Text
+            style={[
+              styles.errorText,
+              {color: colors.danger},
+            ]}>
             {error || 'הלקוח לא נמצא.'}
           </Text>
         </View>
@@ -124,41 +150,60 @@ export default function CustomerDetailsScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={[
+        styles.container,
+        {backgroundColor: colors.background},
+      ]}>
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}>
 
         <View style={styles.header}>
-        <BackButton />
+          <BackButton />
 
-        <Text style={styles.headerTitle}>
+          <Text
+            style={[
+              styles.headerTitle,
+              {color: colors.textPrimary},
+            ]}>
             פרטי לקוח
-        </Text>
+          </Text>
 
-        <TouchableOpacity
-            style={styles.deleteIconButton}
+          <TouchableOpacity
+            style={[
+              styles.deleteIconButton,
+              {backgroundColor: colors.surfaceSecondary},
+            ]}
             activeOpacity={0.7}
             disabled={deleting}
             onPress={handleDeleteCustomer}>
             {deleting ? (
-            <ActivityIndicator
+              <ActivityIndicator
                 size="small"
-                color={Colors.danger}
-            />
+                color={colors.danger}
+              />
             ) : (
-            <MaterialDesignIcons
+              <MaterialDesignIcons
                 name="delete-outline"
                 size={24}
-                color={Colors.danger}
-            />
+                color={colors.danger}
+              />
             )}
-        </TouchableOpacity>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.customerHeader}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>
+          <View
+            style={[
+              styles.avatar,
+              {backgroundColor: colors.surfaceSecondary},
+            ]}>
+            <Text
+              style={[
+                styles.avatarText,
+                {color: colors.primary},
+              ]}>
               {customer.name
                 ?.trim()
                 .charAt(0)
@@ -166,65 +211,132 @@ export default function CustomerDetailsScreen() {
             </Text>
           </View>
 
-          <Text style={styles.customerName}>
+          <Text
+            style={[
+              styles.customerName,
+              {color: colors.textPrimary},
+            ]}>
             {customer.name}
           </Text>
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>
+        <View
+          style={[
+            styles.card,
+            {
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
+            },
+          ]}>
+          <Text
+            style={[
+              styles.cardTitle,
+              {color: colors.textPrimary},
+            ]}>
             פרטי קשר
           </Text>
 
           <View style={styles.detailRow}>
-            <Text style={styles.detailValue}>
+            <Text
+              style={[
+                styles.detailValue,
+                {color: colors.textPrimary},
+              ]}>
               {customer.phone || 'לא הוזן'}
             </Text>
 
-            <Text style={styles.detailLabel}>
+            <Text
+              style={[
+                styles.detailLabel,
+                {color: colors.textSecondary},
+              ]}>
               טלפון
             </Text>
           </View>
 
-          <View style={styles.separator} />
+          <View
+            style={[
+              styles.separator,
+              {backgroundColor: colors.border},
+            ]}
+          />
 
           <View style={styles.detailRow}>
-            <Text style={styles.detailValue}>
+            <Text
+              style={[
+                styles.detailValue,
+                {color: colors.textPrimary},
+              ]}>
               {customer.email || 'לא הוזן'}
             </Text>
 
-            <Text style={styles.detailLabel}>
+            <Text
+              style={[
+                styles.detailLabel,
+                {color: colors.textSecondary},
+              ]}>
               אימייל
             </Text>
           </View>
 
-          <View style={styles.separator} />
+          <View
+            style={[
+              styles.separator,
+              {backgroundColor: colors.border},
+            ]}
+          />
 
           <View style={styles.detailRow}>
-            <Text style={styles.detailValue}>
+            <Text
+              style={[
+                styles.detailValue,
+                {color: colors.textPrimary},
+              ]}>
               {customer.address || 'לא הוזנה'}
             </Text>
 
-            <Text style={styles.detailLabel}>
+            <Text
+              style={[
+                styles.detailLabel,
+                {color: colors.textSecondary},
+              ]}>
               כתובת
             </Text>
           </View>
         </View>
 
         {customer.notes ? (
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>
+          <View
+            style={[
+              styles.card,
+              {
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
+              },
+            ]}>
+            <Text
+              style={[
+                styles.cardTitle,
+                {color: colors.textPrimary},
+              ]}>
               הערות
             </Text>
 
-            <Text style={styles.notes}>
+            <Text
+              style={[
+                styles.notes,
+                {color: colors.textSecondary},
+              ]}>
               {customer.notes}
             </Text>
           </View>
         ) : null}
 
         <TouchableOpacity
-          style={styles.editButton}
+          style={[
+            styles.editButton,
+            {backgroundColor: colors.primary},
+          ]}
           activeOpacity={0.8}
           onPress={() =>
             navigation.navigate('EditCustomer', {
@@ -244,7 +356,6 @@ export default function CustomerDetailsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
   },
 
   content: {
@@ -263,7 +374,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: Colors.textPrimary,
   },
 
   customerHeader: {
@@ -275,7 +385,6 @@ const styles = StyleSheet.create({
     width: 76,
     height: 76,
     borderRadius: 38,
-    backgroundColor: '#EEF2FF',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -283,22 +392,18 @@ const styles = StyleSheet.create({
   avatarText: {
     fontSize: 26,
     fontWeight: '700',
-    color: Colors.primary,
   },
 
   customerName: {
     marginTop: 12,
     fontSize: 22,
     fontWeight: '700',
-    color: Colors.textPrimary,
     textAlign: 'center',
   },
 
   card: {
-    backgroundColor: Colors.surface,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: Colors.border,
     padding: 18,
     marginBottom: 16,
   },
@@ -306,7 +411,6 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: Colors.textPrimary,
     textAlign: 'right',
     marginBottom: 16,
   },
@@ -320,7 +424,6 @@ const styles = StyleSheet.create({
 
   detailLabel: {
     fontSize: 14,
-    color: Colors.textSecondary,
     textAlign: 'right',
   },
 
@@ -329,19 +432,16 @@ const styles = StyleSheet.create({
     marginRight: 20,
     fontSize: 14,
     fontWeight: '500',
-    color: Colors.textPrimary,
     textAlign: 'left',
   },
 
   separator: {
     height: 1,
-    backgroundColor: Colors.border,
   },
 
   notes: {
     fontSize: 14,
     lineHeight: 22,
-    color: Colors.textSecondary,
     textAlign: 'right',
   },
 
@@ -349,7 +449,6 @@ const styles = StyleSheet.create({
     minHeight: 52,
     marginTop: 8,
     borderRadius: 14,
-    backgroundColor: Colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -368,7 +467,6 @@ const styles = StyleSheet.create({
 
   loadingText: {
     fontSize: 14,
-    color: Colors.textSecondary,
   },
 
   errorContainer: {
@@ -379,15 +477,14 @@ const styles = StyleSheet.create({
   errorText: {
     marginTop: 30,
     fontSize: 14,
-    color: Colors.danger,
     textAlign: 'center',
   },
+
   deleteIconButton: {
     width: 40,
     height: 40,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FEE2E2',
   },
 });
