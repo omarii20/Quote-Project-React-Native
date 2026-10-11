@@ -1,4 +1,4 @@
-import React, {useMemo} from 'react';
+import React, {useMemo, useCallback, useState} from 'react';
 
 import {
   StyleSheet,
@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-
+import {useFocusEffect} from '@react-navigation/native';
 import {
   useNavigation,
   type CompositeNavigationProp,
@@ -61,137 +61,84 @@ type NavigationProp =
 export default function NeedAttention({quotes}: Props) {
   const navigation = useNavigation<NavigationProp>();
   const {colors} = useTheme();
+  const [currentTime, setCurrentTime] = useState(() => Date.now());
+
+  useFocusEffect(
+    useCallback(() => {
+      setCurrentTime(Date.now());
+    }, []),
+  );
 
   const attentionQuotes = useMemo(() => {
-    const now = new Date();
+    
+    const now = new Date(currentTime);
 
     const items: AttentionItem[] = [];
 
     quotes.forEach(quote => {
-      const status =
-        quote.status?.toLowerCase();
+      const status = quote.status?.toLowerCase();
+      const canExpire = status === 'sent' || status === 'viewed' || status === 'expired';
 
-      const createdAt =
-        quote.created_at
-          ? new Date(
-              quote.created_at,
-            )
-          : null;
-
-      const validUntil =
-        quote.valid_until
-          ? new Date(
-              quote.valid_until,
-            )
-          : null;
-
-      const daysSinceCreated =
-        createdAt
-          ? Math.floor(
-              (
-                now.getTime() -
-                createdAt.getTime()
-              ) /
-                (
-                  1000 *
-                  60 *
-                  60 *
-                  24
-                ),
-            )
-          : 0;
-
-      const daysUntilExpiration =
-        validUntil
-          ? Math.ceil(
-              (
-                validUntil.getTime() -
-                now.getTime()
-              ) /
-                (
-                  1000 *
-                  60 *
-                  60 *
-                  24
-                ),
-            )
-          : null;
-
-      if (
-        status === 'expired' ||
-        (
-          validUntil &&
-          validUntil.getTime() <
-            now.getTime()
-        )
-      ) {
-        items.push({
-          quote,
-          message:
-            'תוקף ההצעה פג',
-          priority: 1,
-        });
-
+      // הצעה שאושרה אינה דורשת טיפול
+      if (status === 'approved') {
         return;
       }
 
-      if (
-        daysUntilExpiration !==
-          null &&
-        daysUntilExpiration >= 0 &&
-        daysUntilExpiration <= 2
-      ) {
+      // הצעה שנדחתה דורשת טיפול
+      if (status === 'rejected') {
         items.push({
           quote,
-          message:
-            daysUntilExpiration === 0
-              ? 'תוקף ההצעה מסתיים היום'
-              : daysUntilExpiration === 1
-                ? 'תוקף ההצעה מסתיים מחר'
-                : 'תוקף ההצעה מסתיים בעוד יומיים',
+          message: 'הלקוח דחה את הצעת המחיר',
           priority: 2,
         });
 
         return;
       }
+      const createdAt = quote.created_at ? new Date(quote.created_at,) : null;
+      const validUntil = quote.valid_until ? new Date(quote.valid_until,) : null;
+      const daysSinceCreated = createdAt ? Math.floor((now.getTime() - createdAt.getTime()) /(1000 * 60 * 60 * 24),): 0;
+      const daysUntilExpiration = validUntil ? Math.ceil((validUntil.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),) : null;
 
-      if (
-        status === 'viewed' &&
-        daysSinceCreated >= 2
-      ) {
-        items.push({
-          quote,
-          message:
-            'הלקוח צפה בהצעה ועדיין לא אישר',
+      if (status === 'expired' ||  (canExpire && validUntil && validUntil.getTime() < now.getTime())) {
+        items.push({quote, message:'תוקף ההצעה פג',priority: 1,});
+        return;
+      }
+
+      if (canExpire && daysUntilExpiration !== null && daysUntilExpiration >= 0 && daysUntilExpiration <= 2) {
+        items.push({ quote, message:
+            daysUntilExpiration === 0
+              ? 'תוקף ההצעה מסתיים היום'
+              : daysUntilExpiration === 1
+                ? 'תוקף ההצעה מסתיים מחר'
+                : 'תוקף ההצעה מסתיים בעוד יומיים',
           priority: 3,
         });
 
         return;
       }
 
-      if (
-        status === 'sent' &&
-        daysSinceCreated >= 5
-      ) {
-        items.push({
-          quote,
-          message:
-            `ממתינה לתשובת הלקוח כבר ${daysSinceCreated} ימים`,
-          priority: 4,
+      if ( status === 'viewed' && daysSinceCreated >= 2) {
+        items.push({quote, 
+          message:'הלקוח צפה בהצעה ועדיין לא אישר',
+          priority:4,
         });
 
         return;
       }
 
-      if (
-        status === 'draft' &&
-        daysSinceCreated >= 3
-      ) {
-        items.push({
-          quote,
-          message:
-            `טיוטה שלא נשלחה כבר ${daysSinceCreated} ימים`,
+      if (status === 'sent' && daysSinceCreated >= 5) {
+        items.push({ quote,message:
+            `ממתינה לתשובת הלקוח כבר ${daysSinceCreated} ימים`,
           priority: 5,
+        });
+
+        return;
+      }
+
+      if (status === 'draft' && daysSinceCreated >= 3) {
+        items.push({quote, message:
+            `טיוטה שלא נשלחה כבר ${daysSinceCreated} ימים`,
+          priority: 6,
         });
       }
     });
@@ -203,7 +150,7 @@ export default function NeedAttention({quotes}: Props) {
           b.priority,
       )
       .slice(0, 3);
-  }, [quotes]);
+  }, [quotes, currentTime]);
 
   if (
     attentionQuotes.length === 0

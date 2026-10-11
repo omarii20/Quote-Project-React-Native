@@ -40,6 +40,7 @@ export function QuotesProvider({children}: Props) {
       setError('');
 
       const data = await getQuotes();
+      console.log('Quotes API response:', JSON.stringify(data, null, 2));
 
       setQuotes(data);
     } catch (err) {

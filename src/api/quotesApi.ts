@@ -139,7 +139,7 @@ export type QuoteCustomer = {
 };
 
 export const getQuotes =async (): Promise<Quote[]> => {
-    return apiRequest<Quote[]>('/quotes',
+    return apiRequest<Quote[]>('/quotes?period=all',
       {
         method: 'GET',
       },
