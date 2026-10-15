@@ -6,9 +6,11 @@ import {
 } from 'react-native';
 
 import {useTheme} from '../../../context/ThemeContext';
+import {useBusiness} from '../../../context/BusinessContext';
 
 export default function HomeHeader() {
   const {colors} = useTheme();
+  const {business, loading} = useBusiness();
 
   const hour = new Date().getHours();
 
@@ -37,7 +39,9 @@ export default function HomeHeader() {
           styles.businessName,
           {color: colors.textSecondary},
         ]}>
-        Omari LTD
+        {loading
+          ? 'טוען פרטי עסק...'
+          : business?.business_name ?? 'העסק שלי'}
       </Text>
     </View>
   );
