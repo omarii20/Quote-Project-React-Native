@@ -46,6 +46,8 @@ import {useTheme} from '../../context/ThemeContext';
 
 import QuoteStatusBadge from '../../components/ui/QuoteStatusBadge';
 import BackButton from '../../components/ui/BackButton';
+import {shareQuotePdf} from '../../api/quotePdf';
+import {Eye} from 'lucide-react-native';
 
 type QuoteDetailsRouteProp =
   RouteProp<
@@ -63,14 +65,14 @@ export default function QuoteDetailsScreen() {
   const route = useRoute<QuoteDetailsRouteProp>();
   const navigation = useNavigation<QuoteDetailsNavigationProp>();
   const {colors} = useTheme();
-
+  
   const {quoteId} = route.params;
 
   const [quote, setQuote] = useState<Quote | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [deleting, setDeleting] = useState(false);
-
+  const [sharingPdf, setSharingPdf] = useState(false);
   const {removeQuote} = useQuotes();
 
   useFocusEffect(
@@ -100,6 +102,17 @@ export default function QuoteDetailsScreen() {
       loadQuote();
     }, [quoteId]),
   );
+
+  const handlePreviewQuote = () => {
+    if (!quote || sharingPdf || deleting) {
+      return;
+    }
+
+    navigation.navigate('QuotePdfPreview', {
+      quoteId: quote.id,
+      quoteNumber: quote.quote_number,
+    });
+  };
 
   const formatAmount = (value?: number | string | null,) => {
     const amount = Number(value ?? 0);
@@ -131,6 +144,30 @@ export default function QuoteDetailsScreen() {
     return parsedDate.toLocaleDateString(
       'he-IL',
     );
+  };
+
+  const handleShareQuote = async () => {
+    if (!quote || sharingPdf || deleting) {
+      return;
+    }
+
+    try {
+      setSharingPdf(true);
+
+      await shareQuotePdf(
+        quoteId,
+        quote.quote_number,
+      );
+    } catch (shareError) {
+      console.error('Share quote PDF error:', shareError);
+
+      Alert.alert(
+        'שגיאה',
+        'לא הצלחנו לשתף את הצעת המחיר. נסה שוב.',
+      );
+    } finally {
+      setSharingPdf(false);
+    }
   };
 
   const handleDeleteQuote = () => {
@@ -248,13 +285,31 @@ export default function QuoteDetailsScreen() {
           </View>
         </View>
 
+        {/* Preview PDF button */}
         <TouchableOpacity
           style={[
             styles.deleteIconButton,
             {backgroundColor: colors.surfaceSecondary},
           ]}
           activeOpacity={0.7}
-          disabled={deleting}
+          accessibilityRole="button"
+          accessibilityLabel="צפייה בהצעת מחיר PDF"
+          disabled={sharingPdf || deleting}
+          onPress={handlePreviewQuote}>
+          <Eye
+            size={22}
+            color={colors.textPrimary}
+          />
+        </TouchableOpacity>
+
+        {/* // Delete button */}
+        <TouchableOpacity
+          style={[
+            styles.deleteIconButton,
+            {backgroundColor: colors.surfaceSecondary},
+          ]}
+          activeOpacity={0.7}
+          disabled={sharingPdf || deleting}
           onPress={handleDeleteQuote}>
           {deleting ? (
             <ActivityIndicator
@@ -524,37 +579,61 @@ export default function QuoteDetailsScreen() {
 
       </ScrollView>
 
-      {canEdit ? (
-        <View
+      <View
+        style={[
+          styles.bottomActions,
+          {
+            backgroundColor: colors.background,
+            borderTopColor: colors.border,
+          },
+        ]}>
+
+        {/* Share PDF — available for every quote */}
+        <TouchableOpacity
           style={[
-            styles.bottomActions,
-            {
-              backgroundColor: colors.background,
-              borderTopColor: colors.border,
-            },
-          ]}>
+            styles.editButton,
+            {backgroundColor: colors.primary},
+          ]}
+          activeOpacity={0.8}
+          disabled={sharingPdf || deleting}
+          onPress={handleShareQuote}>
+
+          {sharingPdf ? (
+            <ActivityIndicator color="#FFFFFF" />
+          ) : (
+            <Text style={styles.editButtonText}>
+              שיתוף הצעת מחיר (PDF)
+            </Text>
+          )}
+        </TouchableOpacity>
+
+        {/* Edit — only when allowed */}
+        {canEdit ? (
           <TouchableOpacity
             style={[
               styles.editButton,
-              {backgroundColor: colors.primary},
+              styles.editButtonSpacing,
+              {backgroundColor: colors.surfaceSecondary},
             ]}
             activeOpacity={0.8}
             onPress={() =>
-              navigation.navigate(
-                'EditQuote',
-                {
-                  quoteId: quote.id,
-                },
-              )
+              navigation.navigate('EditQuote', {
+                quoteId: quote.id,
+              })
             }>
-            <Text style={styles.editButtonText}>
+            <Text
+              style={[
+                styles.editButtonText,
+                {color: colors.textPrimary},
+              ]}>
               עריכת הצעת מחיר
             </Text>
           </TouchableOpacity>
-        </View>
-      ) : null}
+        ) : null}
 
-    </SafeAreaView>
+      </View>
+
+      </SafeAreaView>
   );
 }
 
@@ -748,6 +827,10 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+
+  editButtonSpacing: {
+    marginTop: 10,
   },
 
   editButtonText: {
